@@ -51,6 +51,16 @@ with app.app_context():
     db.create_all()
     print("Database tables created successfully!")
 
+# Test route to verify Flask is working
+@app.route('/test')
+def test():
+    static_path = app.static_folder
+    if static_path and os.path.exists(static_path):
+        files = os.listdir(static_path)
+        return f"Static folder exists at: {static_path}<br>Files: {files}"
+    else:
+        return f"Static folder not found. Looking for: {static_path}"
+
 # Serve frontend
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -66,7 +76,7 @@ def serve(path):
         if os.path.exists(index_path):
             return send_from_directory(static_folder_path, 'index.html')
         else:
-            return "index.html not found", 404
+            return f"index.html not found at: {index_path}", 404
 
 
 if __name__ == '__main__':
