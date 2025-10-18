@@ -49,17 +49,15 @@ db.init_app(app)
 
 # Create database tables
 with app.app_context():
-    try:
-        # Try to create tables normally first
-        db.create_all()
-        print("Database tables created successfully!")
-    except Exception as e:
-        # If there's a conflict, drop and recreate
-        print(f"Error creating tables: {e}")
-        print("Dropping all tables and recreating...")
-        db.drop_all()
-        db.create_all()
-        print("Database tables recreated successfully!")
+    # FORCE DROP AND RECREATE - Remove this section after first successful deployment
+    print("=" * 50)
+    print("FORCING DATABASE RECREATION")
+    print("=" * 50)
+    db.drop_all()
+    print("All tables dropped!")
+    db.create_all()
+    print("All tables created with new schema!")
+    print("=" * 50)
 
 # Register API blueprints FIRST (so they take priority)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
