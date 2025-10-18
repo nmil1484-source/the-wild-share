@@ -24,6 +24,8 @@ app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'sta
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
 app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-production')
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=7)
+app.config['JWT_IDENTITY_CLAIM'] = 'sub'
+app.config['JWT_ERROR_MESSAGE_KEY'] = 'error'
 
 # Enable CORS for all routes
 CORS(app, resources={r"/api/*": {"origins": "*"}})
