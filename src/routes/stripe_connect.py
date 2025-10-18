@@ -78,8 +78,8 @@ def create_onboarding_link():
         return jsonify({'error': 'No Connect account found. Create one first.'}), 400
     
     data = request.get_json()
-   refresh_url = data.get('refresh_url', 'https://www.thewildshare.com')
-return_url = data.get('return_url', 'https://www.thewildshare.com')
+    refresh_url = data.get('refresh_url', 'https://the-wild-share.onrender.com/dashboard')
+    return_url = data.get('return_url', 'https://the-wild-share.onrender.com/dashboard')
     
     try:
         # Create account link for onboarding
