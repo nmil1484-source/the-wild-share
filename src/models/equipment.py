@@ -8,6 +8,8 @@ class Equipment(db.Model):
     description = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(50), nullable=False)  # power, connectivity, recreation
     daily_price = db.Column(db.Float, nullable=False)
+    weekly_price = db.Column(db.Float, nullable=True)
+    monthly_price = db.Column(db.Float, nullable=True)
     capacity_spec = db.Column(db.String(50))
     image_url = db.Column(db.String(255))
     is_available = db.Column(db.Boolean, default=True)
@@ -28,6 +30,8 @@ class Equipment(db.Model):
             'description': self.description,
             'category': self.category,
             'daily_price': self.daily_price,
+            'weekly_price': self.weekly_price,
+            'monthly_price': self.monthly_price,
             'capacity_spec': self.capacity_spec,
             'image_url': self.image_url,
             'is_available': self.is_available,
