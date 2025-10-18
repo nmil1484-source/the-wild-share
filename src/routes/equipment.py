@@ -58,6 +58,8 @@ def create_equipment():
         description=data['description'],
         category=data['category'],
         daily_price=float(data['daily_price']),
+        weekly_price=float(data['weekly_price']) if data.get('weekly_price') else None,
+        monthly_price=float(data['monthly_price']) if data.get('monthly_price') else None,
         capacity_spec=data.get('capacity_spec'),
         image_url=data.get('image_url'),
         is_available=data.get('is_available', True)
@@ -96,6 +98,10 @@ def update_equipment(equipment_id):
         equipment.category = data['category']
     if 'daily_price' in data:
         equipment.daily_price = float(data['daily_price'])
+    if 'weekly_price' in data:
+        equipment.weekly_price = float(data['weekly_price']) if data['weekly_price'] else None
+    if 'monthly_price' in data:
+        equipment.monthly_price = float(data['monthly_price']) if data['monthly_price'] else None
     if 'capacity_spec' in data:
         equipment.capacity_spec = data['capacity_spec']
     if 'image_url' in data:
