@@ -49,8 +49,17 @@ db.init_app(app)
 
 # Create database tables
 with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
+    # Drop all tables and recreate (for schema updates)
+    # Only do this if using PostgreSQL and FORCE_RECREATE_DB is set
+    if database_url and os.environ.get('FORCE_RECREATE_DB') == 'true':
+        print("Dropping all tables...")
+        db.drop_all()
+        print("Creating fresh database tables...")
+        db.create_all()
+        print("Database tables recreated successfully!")
+    else:
+        db.create_all()
+        print("Database tables created successfully!")
 
 # Register API blueprints FIRST (so they take priority)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
