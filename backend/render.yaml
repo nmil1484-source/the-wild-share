@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: the-wild-share
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --bind 0.0.0.0:$PORT src.main:app
+    envVars:
+      - key: FLASK_APP
+        value: src/main.py
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+
