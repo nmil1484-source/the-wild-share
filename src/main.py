@@ -6,6 +6,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from flask import Flask, send_from_directory, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from datetime import timedelta
 
@@ -34,6 +36,12 @@ CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialize extensions
 jwt = JWTManager(app)
+limiter = Limiter(
+    app=app,
+    key_func=get_remote_address,
+    default_limits=["200 per day", "50 per hour"],
+    storage_uri="memory://"
+)
 
 # Database configuration
 # Use PostgreSQL from Railway or fallback to SQLite for local development
@@ -76,6 +84,10 @@ with app.app_context():
 
 # Register API blueprints FIRST (so they take priority)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
+# Apply rate limiting to auth endpoints
+# Note: Rate limiting is configured but not applied to specific endpoints to avoid startup errors
+# limiter.limit("5 per hour")(auth_bp.view_functions['register'])
+# limiter.limit("10 per minute")(auth_bp.view_functions['login'])
 app.register_blueprint(equipment_bp, url_prefix='/api')
 app.register_blueprint(bookings_bp, url_prefix='/api')
 app.register_blueprint(payments_bp, url_prefix='/api')
@@ -88,6 +100,12 @@ app.register_blueprint(verification_bp, url_prefix='/api')
 @app.route('/assets/<path:path>')
 def serve_assets(path):
     return send_from_directory(os.path.join(app.static_folder, 'assets'), path)
+
+# Serve uploaded images
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    uploads_folder = os.path.join(os.path.dirname(__file__), 'static', 'uploads')
+    return send_from_directory(uploads_folder, filename)
 
 # Health check endpoint
 @app.route('/health')
@@ -114,3 +132,4 @@ def serve(path):
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
+# Force rebuild Thu Oct 23 16:42:10 EDT 2025

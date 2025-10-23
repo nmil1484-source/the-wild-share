@@ -1,9 +1,2 @@
-[phases.setup]
-nixPkgs = ["python39", "pip"]
-
-[phases.install]
-cmds = ["cd backend && pip install -r requirements.txt"]
-
 [start]
-cmd = "cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 wsgi:app"
-
+cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 wsgi:app"

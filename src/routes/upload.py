@@ -69,6 +69,14 @@ def upload_image():
     if file_extension not in allowed_extensions:
         return jsonify({'error': 'Invalid file type. Allowed: png, jpg, jpeg, gif, webp'}), 400
     
+    # Validate file size (max 5MB)
+    file.seek(0, os.SEEK_END)
+    file_size = file.tell()
+    file.seek(0)  # Reset file pointer
+    
+    if file_size > 5 * 1024 * 1024:  # 5MB
+        return jsonify({'error': 'File too large. Maximum size is 5MB'}), 400
+    
     try:
         # Generate unique filename
         filename = f"{user_id}_{uuid.uuid4().hex[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file_extension}"
@@ -118,6 +126,14 @@ def upload_multiple_images():
             file_extension = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
             
             if file_extension not in allowed_extensions:
+                continue
+            
+            # Validate file size (max 5MB)
+            file.seek(0, os.SEEK_END)
+            file_size = file.tell()
+            file.seek(0)  # Reset file pointer
+            
+            if file_size > 5 * 1024 * 1024:  # 5MB
                 continue
             
             # Generate unique filename

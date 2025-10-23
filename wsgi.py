@@ -1,10 +1,15 @@
+#!/usr/bin/env python3
+"""
+WSGI entry point for The Wild Share application
+"""
 import os
 import sys
 
-# Add the parent directory to the path so we can import from src
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Add the current directory to Python path so 'src' module can be found
+current_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, current_dir)
 
-# Import the Flask app
+# Now import the app from src.main
 from src.main import app
 
 if __name__ == "__main__":
