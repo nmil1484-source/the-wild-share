@@ -132,3 +132,4 @@ def serve(path):
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
 
+# Force rebuild Thu Oct 23 16:42:10 EDT 2025
