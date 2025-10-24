@@ -135,3 +135,24 @@ def delete_account():
         'message': 'Account deleted successfully'
     }), 200
 
+
+# TEMPORARY: Database reset endpoint for development
+@auth_bp.route('/reset-database-temp-dev-only', methods=['POST'])
+def reset_database():
+    """
+    DANGER: This endpoint deletes ALL users from the database.
+    Only use during development. Remove before going live!
+    """
+    try:
+        # Delete all users
+        num_deleted = User.query.delete()
+        db.session.commit()
+        
+        return jsonify({
+            'message': f'Database reset successful. Deleted {num_deleted} users.',
+            'warning': 'This endpoint should be removed before production!'
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
