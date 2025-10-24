@@ -18,7 +18,9 @@ function App() {
   const [myEquipment, setMyEquipment] = useState([])
   const [myBookings, setMyBookings] = useState([])
   const [showAuthDialog, setShowAuthDialog] = useState(false)
-  const [authMode, setAuthMode] = useState('login')
+  const [authMode, setAuthMode] = useState('login') // 'login', 'register', 'forgot-password', 'reset-password'
+  const [resetToken, setResetToken] = useState('')
+  const [resetEmail, setResetEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [currentView, setCurrentView] = useState('home')
   const [showEditDialog, setShowEditDialog] = useState(false)
@@ -111,6 +113,17 @@ function App() {
       loadUser()
     }
     loadEquipment()
+    
+    // Check for password reset token in URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const resetTokenParam = urlParams.get('token')
+    if (resetTokenParam) {
+      setResetToken(resetTokenParam)
+      setAuthMode('reset-password')
+      setShowAuthDialog(true)
+      // Clear the token from URL for security
+      window.history.replaceState({}, document.title, window.location.pathname)
+    }
   }, [])
 
   // Load equipment when category changes
@@ -186,19 +199,44 @@ function App() {
     e.preventDefault()
     setLoading(true)
     try {
-      const response = authMode === 'login' 
-        ? await authAPI.login({ email: authForm.email, password: authForm.password })
-        : await authAPI.register(authForm)
-      
-      localStorage.setItem('access_token', response.data.access_token)
-      setUser(response.data.user)
-      setShowAuthDialog(false)
-      setAuthForm({ email: '', password: '', first_name: '', last_name: '', phone: '', user_type: 'both' })
-      loadEquipment()
-      if (response.data.user.user_type === 'owner' || response.data.user.user_type === 'both') {
-        loadMyEquipment()
+      if (authMode === 'forgot-password') {
+        // Request password reset
+        const response = await authAPI.requestPasswordReset({ email: authForm.email })
+        alert(response.data.message)
+        // In development, show the reset link
+        if (response.data.reset_link) {
+          console.log('Reset link:', response.data.reset_link)
+          console.log('Reset token:', response.data.token)
+          // Auto-fill token for testing
+          setResetToken(response.data.token)
+          setResetEmail(authForm.email)
+          setAuthMode('reset-password')
+        } else {
+          setShowAuthDialog(false)
+        }
+      } else if (authMode === 'reset-password') {
+        // Reset password with token
+        await authAPI.resetPassword({ token: resetToken, new_password: authForm.password })
+        alert('Password reset successful! You can now log in with your new password.')
+        setAuthMode('login')
+        setResetToken('')
+        setAuthForm({ email: resetEmail, password: '', first_name: '', last_name: '', phone: '', user_type: 'both' })
+      } else {
+        // Normal login or register
+        const response = authMode === 'login' 
+          ? await authAPI.login({ email: authForm.email, password: authForm.password })
+          : await authAPI.register(authForm)
+        
+        localStorage.setItem('access_token', response.data.access_token)
+        setUser(response.data.user)
+        setShowAuthDialog(false)
+        setAuthForm({ email: '', password: '', first_name: '', last_name: '', phone: '', user_type: 'both' })
+        loadEquipment()
+        if (response.data.user.user_type === 'owner' || response.data.user.user_type === 'both') {
+          loadMyEquipment()
+        }
+        loadMyBookings()
       }
-      loadMyBookings()
     } catch (error) {
       alert(error.response?.data?.error || 'Authentication failed')
     } finally {
@@ -553,9 +591,17 @@ function App() {
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
-                    <DialogTitle>{authMode === 'login' ? 'Sign In' : 'Create Account'}</DialogTitle>
+                    <DialogTitle>
+                      {authMode === 'login' && 'Sign In'}
+                      {authMode === 'register' && 'Create Account'}
+                      {authMode === 'forgot-password' && 'Reset Password'}
+                      {authMode === 'reset-password' && 'Set New Password'}
+                    </DialogTitle>
                     <DialogDescription>
-                      {authMode === 'login' ? 'Sign in to book equipment' : 'Create an account to get started'}
+                      {authMode === 'login' && 'Sign in to book equipment'}
+                      {authMode === 'register' && 'Create an account to get started'}
+                      {authMode === 'forgot-password' && 'Enter your email to receive a password reset link'}
+                      {authMode === 'reset-password' && 'Enter your new password'}
                     </DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleAuth} className="space-y-4">
@@ -579,39 +625,64 @@ function App() {
                             required
                           />
                         </div>
-
                       </>
                     )}
-                    <div>
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={authForm.email}
-                        onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="password">Password</Label>
-                      <Input
-                        id="password"
-                        type="password"
-                        value={authForm.password}
-                        onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
-                        required
-                      />
-                    </div>
+                    {(authMode === 'login' || authMode === 'register' || authMode === 'forgot-password') && (
+                      <div>
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={authForm.email}
+                          onChange={(e) => setAuthForm({...authForm, email: e.target.value})}
+                          required
+                          disabled={authMode === 'reset-password'}
+                        />
+                      </div>
+                    )}
+                    {(authMode === 'login' || authMode === 'register' || authMode === 'reset-password') && (
+                      <div>
+                        <Label htmlFor="password">{authMode === 'reset-password' ? 'New Password' : 'Password'}</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={authForm.password}
+                          onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
+                          required
+                          minLength={authMode === 'reset-password' ? 8 : undefined}
+                        />
+                        {authMode === 'reset-password' && (
+                          <p className="text-sm text-gray-500 mt-1">Password must be at least 8 characters</p>
+                        )}
+                      </div>
+                    )}
                     <Button type="submit" className="w-full" disabled={loading}>
-                      {loading ? 'Loading...' : (authMode === 'login' ? 'Sign In' : 'Create Account')}
+                      {loading ? 'Loading...' : (
+                        authMode === 'login' ? 'Sign In' :
+                        authMode === 'register' ? 'Create Account' :
+                        authMode === 'forgot-password' ? 'Send Reset Link' :
+                        'Reset Password'
+                      )}
                     </Button>
+                    {authMode === 'login' && (
+                      <Button
+                        type="button"
+                        variant="link"
+                        className="w-full text-sm"
+                        onClick={() => setAuthMode('forgot-password')}
+                      >
+                        Forgot password?
+                      </Button>
+                    )}
                     <Button
                       type="button"
                       variant="link"
                       className="w-full"
                       onClick={() => setAuthMode(authMode === 'login' ? 'register' : 'login')}
                     >
-                      {authMode === 'login' ? 'Need an account? Register' : 'Already have an account? Sign in'}
+                      {authMode === 'login' ? 'Need an account? Register' : 
+                       authMode === 'register' ? 'Already have an account? Sign in' :
+                       'Back to Sign In'}
                     </Button>
                   </form>
                 </DialogContent>

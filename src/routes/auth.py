@@ -136,23 +136,119 @@ def delete_account():
     }), 200
 
 
-# TEMPORARY: Database reset endpoint for development
-@auth_bp.route('/reset-database-temp-dev-only', methods=['POST'])
-def reset_database():
-    """
-    DANGER: This endpoint deletes ALL users from the database.
-    Only use during development. Remove before going live!
-    """
-    try:
-        # Delete all users
-        num_deleted = User.query.delete()
-        db.session.commit()
-        
+
+
+
+
+# Password Reset Functionality
+import secrets
+from datetime import datetime, timedelta
+
+# Store password reset tokens temporarily (in production, use Redis or database)
+password_reset_tokens = {}
+
+@auth_bp.route('/request-password-reset', methods=['POST'])
+def request_password_reset():
+    """Request a password reset token"""
+    data = request.get_json()
+    
+    if 'email' not in data:
+        return jsonify({'error': 'Email is required'}), 400
+    
+    user = User.query.filter_by(email=data['email']).first()
+    
+    if not user:
+        # Don't reveal if email exists or not (security best practice)
         return jsonify({
-            'message': f'Database reset successful. Deleted {num_deleted} users.',
-            'warning': 'This endpoint should be removed before production!'
+            'message': 'If an account with that email exists, a password reset link has been sent.'
         }), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+    
+    # Generate secure reset token
+    reset_token = secrets.token_urlsafe(32)
+    
+    # Store token with expiration (15 minutes)
+    password_reset_tokens[reset_token] = {
+        'user_id': user.id,
+        'email': user.email,
+        'expires_at': datetime.utcnow() + timedelta(minutes=15)
+    }
+    
+    # In production, send email with reset link
+    # For now, return the token (for testing)
+    reset_link = f"https://www.thewildshare.com/reset-password?token={reset_token}"
+    
+    # TODO: Send email with reset_link
+    # For development, we'll return it in the response
+    return jsonify({
+        'message': 'If an account with that email exists, a password reset link has been sent.',
+        'reset_link': reset_link,  # Remove this in production
+        'token': reset_token  # Remove this in production
+    }), 200
+
+@auth_bp.route('/reset-password', methods=['POST'])
+def reset_password():
+    """Reset password using token"""
+    data = request.get_json()
+    
+    if 'token' not in data or 'new_password' not in data:
+        return jsonify({'error': 'Token and new password are required'}), 400
+    
+    token = data['token']
+    new_password = data['new_password']
+    
+    # Validate password strength
+    if len(new_password) < 8:
+        return jsonify({'error': 'Password must be at least 8 characters long'}), 400
+    
+    # Check if token exists and is valid
+    if token not in password_reset_tokens:
+        return jsonify({'error': 'Invalid or expired reset token'}), 400
+    
+    token_data = password_reset_tokens[token]
+    
+    # Check if token has expired
+    if datetime.utcnow() > token_data['expires_at']:
+        del password_reset_tokens[token]
+        return jsonify({'error': 'Reset token has expired'}), 400
+    
+    # Find user and update password
+    user = User.query.get(token_data['user_id'])
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Update password
+    user.password_hash = generate_password_hash(new_password)
+    db.session.commit()
+    
+    # Delete used token
+    del password_reset_tokens[token]
+    
+    return jsonify({
+        'message': 'Password reset successful. You can now log in with your new password.'
+    }), 200
+
+@auth_bp.route('/verify-reset-token', methods=['POST'])
+def verify_reset_token():
+    """Verify if a reset token is valid"""
+    data = request.get_json()
+    
+    if 'token' not in data:
+        return jsonify({'error': 'Token is required'}), 400
+    
+    token = data['token']
+    
+    if token not in password_reset_tokens:
+        return jsonify({'valid': False, 'error': 'Invalid or expired token'}), 200
+    
+    token_data = password_reset_tokens[token]
+    
+    if datetime.utcnow() > token_data['expires_at']:
+        del password_reset_tokens[token]
+        return jsonify({'valid': False, 'error': 'Token has expired'}), 200
+    
+    return jsonify({
+        'valid': True,
+        'email': token_data['email']
+    }), 200
 
