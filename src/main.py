@@ -70,12 +70,12 @@ with app.app_context():
     
     # Add location column to equipment table if it doesn't exist
     try:
-        from sqlalchemy import text
-        with db.engine.connect() as conn:
-            # Check if location column exists
-            result = conn.execute(text("PRAGMA table_info(equipment)"))
-            columns = [row[1] for row in result]
-            if 'location' not in columns:
+        from sqlalchemy import text, inspect
+        inspector = inspect(db.engine)
+        columns = [col['name'] for col in inspector.get_columns('equipment')]
+        
+        if 'location' not in columns:
+            with db.engine.connect() as conn:
                 conn.execute(text("ALTER TABLE equipment ADD COLUMN location VARCHAR(255)"))
                 conn.commit()
                 print("Added location column to equipment table")
