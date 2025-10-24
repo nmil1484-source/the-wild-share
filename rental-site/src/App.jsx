@@ -226,16 +226,22 @@ function App() {
 
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files)
-    if (files.length > 5) {
-      alert('Maximum 5 images allowed')
+    
+    // Check if adding these files would exceed the limit
+    if (equipmentImages.length + files.length > 5) {
+      alert(`Maximum 5 images allowed. You can add ${5 - equipmentImages.length} more image(s).`)
       return
     }
     
-    setEquipmentImages(files)
+    // Append new files to existing images
+    setEquipmentImages(prev => [...prev, ...files])
     
-    // Create preview URLs
-    const previews = files.map(file => URL.createObjectURL(file))
-    setImagePreviewUrls(previews)
+    // Create preview URLs for new files and append to existing previews
+    const newPreviews = files.map(file => URL.createObjectURL(file))
+    setImagePreviewUrls(prev => [...prev, ...newPreviews])
+    
+    // Clear the input so the same file can be selected again if needed
+    e.target.value = ''
   }
 
   const handleRemoveImage = (index) => {
