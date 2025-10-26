@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from src.models.user import db, User
 from src.models.equipment import Equipment
 from src.models.message import Message
+from src.utils.email_notifications import send_new_message_notification_email
 
 messages_bp = Blueprint('messages', __name__)
 
@@ -37,6 +38,14 @@ def send_message(equipment_id):
     
     db.session.add(new_message)
     db.session.commit()
+    
+    # Send email notification to receiver
+    try:
+        sender = User.query.get(sender_id)
+        receiver = User.query.get(receiver_id)
+        send_new_message_notification_email(new_message, sender, receiver, equipment)
+    except Exception as e:
+        print(f"Error sending message notification email: {e}")
     
     return jsonify({
         'message': 'Message sent successfully',

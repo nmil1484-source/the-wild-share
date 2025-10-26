@@ -6,6 +6,7 @@ from src.models.user import db, User
 from src.models.booking import Booking
 from src.models.payment import Payment
 from src.models.equipment import Equipment
+from src.utils.email_notifications import send_payment_confirmation_email
 
 payments_bp = Blueprint('payments', __name__)
 
@@ -141,6 +142,15 @@ def confirm_payment():
         booking.status = 'confirmed'
     
     db.session.commit()
+    
+    # Send payment confirmation email
+    try:
+        equipment = Equipment.query.get(booking.equipment_id)
+        renter = User.query.get(booking.renter_id)
+        total_paid = booking.total_cost + booking.deposit_amount
+        send_payment_confirmation_email(booking, equipment, renter, total_paid)
+    except Exception as e:
+        print(f"Error sending payment confirmation email: {e}")
     
     return jsonify({
         'message': 'Payment confirmed successfully',

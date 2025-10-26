@@ -5,6 +5,7 @@ from src.models.user import db, User
 from src.models.equipment import Equipment
 from src.models.booking import Booking
 from src.routes.verification import can_rent_equipment, calculate_trust_level
+from src.utils.email_notifications import send_booking_confirmation_email, send_new_booking_notification_email
 
 bookings_bp = Blueprint('bookings', __name__)
 
@@ -87,6 +88,14 @@ def create_booking():
     
     db.session.add(new_booking)
     db.session.commit()
+    
+    # Send email notifications
+    try:
+        owner = User.query.get(equipment.owner_id)
+        send_booking_confirmation_email(new_booking, equipment, renter, owner)
+        send_new_booking_notification_email(new_booking, equipment, renter, owner)
+    except Exception as e:
+        print(f"Error sending booking emails: {e}")
     
     return jsonify({
         'message': 'Booking created successfully',
