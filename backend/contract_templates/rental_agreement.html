@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #059669;
+            border-bottom: 3px solid #059669;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #047857;
+            margin-top: 25px;
+            border-bottom: 1px solid #d1d5db;
+            padding-bottom: 5px;
+        }
+        .section {
+            margin: 20px 0;
+        }
+        .important {
+            background-color: #fef3c7;
+            padding: 15px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+        }
+        .signature-block {
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+        .signature-line {
+            border-bottom: 2px solid #000;
+            width: 300px;
+            margin: 30px 0 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        td {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+        }
+        .label {
+            font-weight: bold;
+            width: 200px;
+            background-color: #f3f4f6;
+        }
+        ul {
+            margin: 10px 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>EQUIPMENT RENTAL AGREEMENT</h1>
+    
+    <p style="text-align: center; font-size: 14px; color: #666;">
+        This Agreement is made on <strong>{{rental_date}}</strong>
+    </p>
+
+    <h2>1. PARTIES</h2>
+    <div class="section">
+        <table>
+            <tr>
+                <td class="label">Equipment Owner:</td>
+                <td>{{owner_name}}<br>{{owner_email}}<br>{{owner_phone}}</td>
+            </tr>
+            <tr>
+                <td class="label">Renter:</td>
+                <td>{{renter_name}}<br>{{renter_email}}<br>{{renter_phone}}</td>
+            </tr>
+            <tr>
+                <td class="label">Platform:</td>
+                <td>The Wild Share<br>www.thewildshare.com<br>thewildshare@gmail.com</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>2. EQUIPMENT DESCRIPTION</h2>
+    <div class="section">
+        <table>
+            <tr>
+                <td class="label">Equipment Name:</td>
+                <td>{{equipment_name}}</td>
+            </tr>
+            <tr>
+                <td class="label">Category:</td>
+                <td>{{equipment_category}}</td>
+            </tr>
+            <tr>
+                <td class="label">Specifications:</td>
+                <td>{{equipment_specs}}</td>
+            </tr>
+            <tr>
+                <td class="label">Condition:</td>
+                <td>Good working order (unless otherwise noted)</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>3. RENTAL TERMS</h2>
+    <div class="section">
+        <table>
+            <tr>
+                <td class="label">Rental Start Date:</td>
+                <td>{{start_date}}</td>
+            </tr>
+            <tr>
+                <td class="label">Rental End Date:</td>
+                <td>{{end_date}}</td>
+            </tr>
+            <tr>
+                <td class="label">Rental Duration:</td>
+                <td>{{rental_days}} days</td>
+            </tr>
+            <tr>
+                <td class="label">Daily Rate:</td>
+                <td>${{daily_rate}}</td>
+            </tr>
+            <tr>
+                <td class="label">Total Rental Cost:</td>
+                <td>${{total_cost}}</td>
+            </tr>
+            <tr>
+                <td class="label">Security Deposit:</td>
+                <td>${{deposit_amount}}</td>
+            </tr>
+            <tr>
+                <td class="label">Total Amount Paid:</td>
+                <td>${{total_paid}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>4. RENTER RESPONSIBILITIES</h2>
+    <div class="section">
+        <p>The Renter agrees to:</p>
+        <ul>
+            <li><strong>Use the Equipment only for its intended purpose</strong> and in accordance with manufacturer guidelines</li>
+            <li><strong>Maintain the Equipment in good condition</strong> during the rental period</li>
+            <li><strong>Not sublease, lend, or transfer</strong> the Equipment to any third party</li>
+            <li><strong>Return the Equipment on time</strong> in the same condition as received, normal wear and tear excepted</li>
+            <li><strong>Pay for any damage, loss, or theft</strong> of the Equipment during the rental period</li>
+            <li><strong>Notify the Owner immediately</strong> of any damage, malfunction, or loss</li>
+            <li><strong>Follow all applicable laws and regulations</strong> when using the Equipment</li>
+            <li><strong>Maintain adequate insurance coverage</strong> for the Equipment during rental</li>
+        </ul>
+    </div>
+
+    <div class="important">
+        <strong>IMPORTANT:</strong> The Renter is fully responsible for the Equipment from the moment of pickup until the moment of return. Any damage, loss, or theft during this period is the Renter's financial responsibility.
+    </div>
+
+    <h2>5. DAMAGE AND LOSS</h2>
+    <div class="section">
+        <p><strong>5.1 Renter Liability:</strong> The Renter is liable for:</p>
+        <ul>
+            <li>All damage to the Equipment beyond normal wear and tear</li>
+            <li>Complete replacement cost if Equipment is lost or stolen</li>
+            <li>Any costs incurred by the Owner due to late return</li>
+            <li>Cleaning fees if Equipment is returned in unsanitary condition</li>
+        </ul>
+
+        <p><strong>5.2 Security Deposit:</strong> The security deposit will be used to cover:</p>
+        <ul>
+            <li>Repair costs for any damage</li>
+            <li>Replacement cost for lost or stolen Equipment (up to deposit amount)</li>
+            <li>Late fees or cleaning fees</li>
+        </ul>
+
+        <p><strong>5.3 Deposit Refund:</strong> If the Equipment is returned on time and in good condition, the security deposit will be refunded within 3-5 business days after return.</p>
+
+        <p><strong>5.4 Damage Exceeding Deposit:</strong> If damage or loss exceeds the security deposit amount, the Renter agrees to pay the additional costs within 7 days of notification.</p>
+    </div>
+
+    <h2>6. LIABILITY WAIVER AND RELEASE</h2>
+    <div class="section">
+        <p><strong>6.1 Assumption of Risk:</strong> The Renter acknowledges that use of the Equipment involves inherent risks including but not limited to property damage, personal injury, or death. The Renter voluntarily assumes all such risks.</p>
+
+        <p><strong>6.2 Release of Liability:</strong> The Renter releases and holds harmless:</p>
+        <ul>
+            <li>The Equipment Owner</li>
+            <li>The Wild Share platform and its owners, employees, and agents</li>
+        </ul>
+        <p>from any and all claims, damages, losses, liabilities, costs, and expenses (including attorney fees) arising from or related to the rental or use of the Equipment.</p>
+
+        <p><strong>6.3 Indemnification:</strong> The Renter agrees to indemnify and defend the Owner and The Wild Share from any third-party claims arising from the Renter's use of the Equipment.</p>
+    </div>
+
+    <h2>7. INSURANCE</h2>
+    <div class="section">
+        <p>The Renter is responsible for maintaining adequate insurance coverage for the Equipment during the rental period. For equipment valued over $1,000, proof of insurance may be required.</p>
+    </div>
+
+    <h2>8. LATE RETURN</h2>
+    <div class="section">
+        <p>If the Equipment is not returned by the agreed end date:</p>
+        <ul>
+            <li>Late fees of <strong>1.5x the daily rate</strong> will apply for each additional day</li>
+            <li>After 3 days late, the Equipment will be considered stolen and reported to authorities</li>
+            <li>The Renter will be charged the full replacement cost of the Equipment</li>
+        </ul>
+    </div>
+
+    <h2>9. CANCELLATION POLICY</h2>
+    <div class="section">
+        <ul>
+            <li><strong>More than 48 hours before rental:</strong> Full refund minus platform fee</li>
+            <li><strong>24-48 hours before rental:</strong> 50% refund</li>
+            <li><strong>Less than 24 hours before rental:</strong> No refund</li>
+        </ul>
+    </div>
+
+    <h2>10. DISPUTE RESOLUTION</h2>
+    <div class="section">
+        <p>Any disputes arising from this Agreement shall be resolved through:</p>
+        <ol>
+            <li>Good faith negotiation between parties</li>
+            <li>Mediation through The Wild Share platform</li>
+            <li>Binding arbitration if mediation fails</li>
+        </ol>
+        <p>This Agreement shall be governed by the laws of the State of California.</p>
+    </div>
+
+    <h2>11. ENTIRE AGREEMENT</h2>
+    <div class="section">
+        <p>This Agreement constitutes the entire agreement between the parties and supersedes all prior agreements or understandings. This Agreement may only be modified in writing signed by both parties.</p>
+    </div>
+
+    <div class="important">
+        <strong>BY SIGNING BELOW, BOTH PARTIES ACKNOWLEDGE THAT THEY HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY ALL TERMS AND CONDITIONS OF THIS AGREEMENT.</strong>
+    </div>
+
+    <div class="signature-block">
+        <h3>EQUIPMENT OWNER</h3>
+        <div class="signature-line"></div>
+        <p>Signature: {{owner_name}}</p>
+        <p>Date: _______________________</p>
+    </div>
+
+    <div class="signature-block">
+        <h3>RENTER</h3>
+        <div class="signature-line"></div>
+        <p>Signature: {{renter_name}}</p>
+        <p>Date: _______________________</p>
+    </div>
+
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #d1d5db; font-size: 12px; color: #666; text-align: center;">
+        <p>This contract was generated by The Wild Share platform (www.thewildshare.com)</p>
+        <p>Booking ID: {{booking_id}} | Generated: {{generated_date}}</p>
+    </div>
+</body>
+</html>
+

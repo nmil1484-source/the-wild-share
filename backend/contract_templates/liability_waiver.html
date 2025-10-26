@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            color: #dc2626;
+            border-bottom: 3px solid #dc2626;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #991b1b;
+            margin-top: 25px;
+            border-bottom: 1px solid #d1d5db;
+            padding-bottom: 5px;
+        }
+        .warning {
+            background-color: #fee2e2;
+            padding: 20px;
+            border-left: 4px solid #dc2626;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .signature-block {
+            margin-top: 40px;
+            page-break-inside: avoid;
+        }
+        .signature-line {
+            border-bottom: 2px solid #000;
+            width: 300px;
+            margin: 30px 0 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        td {
+            padding: 8px;
+            border: 1px solid #d1d5db;
+        }
+        .label {
+            font-weight: bold;
+            width: 200px;
+            background-color: #f3f4f6;
+        }
+        ul {
+            margin: 10px 0;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .checkbox {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+        }
+    </style>
+</head>
+<body>
+    <h1>LIABILITY WAIVER AND RELEASE OF CLAIMS</h1>
+    
+    <p style="text-align: center; font-size: 14px; color: #666;">
+        <strong>READ CAREFULLY BEFORE SIGNING</strong><br>
+        This is a legal document that affects your rights
+    </p>
+
+    <div class="warning">
+        ⚠️ WARNING: By signing this waiver, you are giving up important legal rights, including the right to sue for injuries or damages. Please read carefully and consult an attorney if you have questions.
+    </div>
+
+    <h2>PARTICIPANT INFORMATION</h2>
+    <div class="section">
+        <table>
+            <tr>
+                <td class="label">Renter Name:</td>
+                <td>{{renter_name}}</td>
+            </tr>
+            <tr>
+                <td class="label">Email:</td>
+                <td>{{renter_email}}</td>
+            </tr>
+            <tr>
+                <td class="label">Phone:</td>
+                <td>{{renter_phone}}</td>
+            </tr>
+            <tr>
+                <td class="label">Equipment:</td>
+                <td>{{equipment_name}}</td>
+            </tr>
+            <tr>
+                <td class="label">Rental Dates:</td>
+                <td>{{start_date}} to {{end_date}}</td>
+            </tr>
+        </table>
+    </div>
+
+    <h2>1. ACKNOWLEDGMENT OF RISKS</h2>
+    <div class="section">
+        <p>I, the undersigned Renter, acknowledge and understand that:</p>
+        <ul>
+            <li>The use of outdoor equipment and participation in outdoor activities involves <strong>inherent risks, dangers, and hazards</strong></li>
+            <li>These risks include but are not limited to:
+                <ul>
+                    <li>Personal injury, disability, or death</li>
+                    <li>Property damage or loss</li>
+                    <li>Equipment malfunction or failure</li>
+                    <li>Adverse weather conditions</li>
+                    <li>Accidents during transportation or use</li>
+                    <li>Contact with wildlife or hazardous terrain</li>
+                    <li>Negligence of other participants or third parties</li>
+                </ul>
+            </li>
+            <li>I am <strong>voluntarily participating</strong> in this rental with full knowledge of the risks involved</li>
+            <li>I am <strong>physically and mentally capable</strong> of safely using the Equipment</li>
+            <li>I have <strong>adequate experience and training</strong> to use the Equipment safely, or will obtain such training before use</li>
+        </ul>
+    </div>
+
+    <h2>2. ASSUMPTION OF RISK</h2>
+    <div class="section">
+        <p>I <strong>voluntarily assume all risks</strong> associated with the rental and use of the Equipment, whether those risks are known or unknown, foreseen or unforeseen. I understand that:</p>
+        <ul>
+            <li>The Equipment Owner and The Wild Share platform <strong>cannot guarantee my safety</strong></li>
+            <li>I am responsible for inspecting the Equipment before use and <strong>refusing to use it if I believe it is unsafe</strong></li>
+            <li>I will <strong>follow all safety guidelines</strong> and manufacturer instructions</li>
+            <li>I will <strong>use appropriate safety gear</strong> (helmets, life jackets, etc.) as required</li>
+        </ul>
+    </div>
+
+    <h2>3. RELEASE AND WAIVER OF LIABILITY</h2>
+    <div class="section">
+        <p>In consideration of being permitted to rent and use the Equipment, I hereby:</p>
+        
+        <p><strong>RELEASE, WAIVE, DISCHARGE, AND COVENANT NOT TO SUE:</strong></p>
+        <ul>
+            <li>The Equipment Owner ({{owner_name}})</li>
+            <li>The Wild Share platform and its owners, officers, employees, agents, and representatives</li>
+            <li>Any affiliates, sponsors, or partners of the above parties</li>
+        </ul>
+
+        <p><strong>FROM ANY AND ALL LIABILITY</strong> for:</p>
+        <ul>
+            <li>Personal injury, disability, or death</li>
+            <li>Property damage or loss</li>
+            <li>Economic losses</li>
+            <li>Any other damages or claims</li>
+        </ul>
+
+        <p><strong>ARISING FROM OR RELATED TO:</strong></p>
+        <ul>
+            <li>My rental, possession, transportation, or use of the Equipment</li>
+            <li>Any defect in the Equipment, whether known or unknown</li>
+            <li>The negligence of the Equipment Owner or The Wild Share platform</li>
+            <li>Any other cause, <strong>INCLUDING BUT NOT LIMITED TO THE NEGLIGENCE OF THE RELEASED PARTIES</strong></li>
+        </ul>
+    </div>
+
+    <h2>4. INDEMNIFICATION</h2>
+    <div class="section">
+        <p>I agree to <strong>INDEMNIFY, DEFEND, AND HOLD HARMLESS</strong> the Equipment Owner and The Wild Share platform from:</p>
+        <ul>
+            <li>Any and all claims, demands, losses, or lawsuits brought by third parties</li>
+            <li>All costs and expenses (including attorney fees) incurred in defending such claims</li>
+            <li>Any claims arising from my use of the Equipment or my violation of this Agreement</li>
+        </ul>
+    </div>
+
+    <h2>5. MEDICAL TREATMENT AUTHORIZATION</h2>
+    <div class="section">
+        <p>I authorize the Equipment Owner or The Wild Share platform to:</p>
+        <ul>
+            <li>Obtain emergency medical treatment for me if necessary</li>
+            <li>Transport me to a medical facility</li>
+            <li>Share my medical information with emergency responders</li>
+        </ul>
+        <p>I agree to be financially responsible for any medical expenses incurred.</p>
+    </div>
+
+    <h2>6. INSURANCE</h2>
+    <div class="section">
+        <p>I understand that:</p>
+        <ul>
+            <li>The Equipment Owner and The Wild Share platform <strong>do not provide insurance coverage</strong> for my injuries or property damage</li>
+            <li>I am <strong>solely responsible</strong> for obtaining my own insurance coverage</li>
+            <li>I should consult with my insurance provider regarding coverage for rental equipment and outdoor activities</li>
+        </ul>
+    </div>
+
+    <h2>7. SEVERABILITY</h2>
+    <div class="section">
+        <p>If any provision of this Waiver is found to be unenforceable or invalid, the remaining provisions shall continue in full force and effect.</p>
+    </div>
+
+    <h2>8. GOVERNING LAW</h2>
+    <div class="section">
+        <p>This Waiver shall be governed by and construed in accordance with the laws of the State of California, without regard to conflict of law principles.</p>
+    </div>
+
+    <div class="warning">
+        ⚠️ I HAVE CAREFULLY READ THIS LIABILITY WAIVER AND FULLY UNDERSTAND ITS CONTENTS. I AM AWARE THAT THIS IS A RELEASE OF LIABILITY AND A CONTRACT BETWEEN MYSELF AND THE EQUIPMENT OWNER AND THE WILD SHARE PLATFORM. I SIGN IT OF MY OWN FREE WILL.
+    </div>
+
+    <h2>RENTER ACKNOWLEDGMENTS</h2>
+    <div class="section">
+        <div class="checkbox">
+            ☐ I am at least 18 years of age
+        </div>
+        <div class="checkbox">
+            ☐ I have read and understood this entire Waiver
+        </div>
+        <div class="checkbox">
+            ☐ I voluntarily agree to its terms and conditions
+        </div>
+        <div class="checkbox">
+            ☐ I understand I am giving up legal rights by signing this document
+        </div>
+        <div class="checkbox">
+            ☐ I have had the opportunity to seek legal advice before signing
+        </div>
+    </div>
+
+    <div class="signature-block">
+        <h3>RENTER SIGNATURE</h3>
+        <div class="signature-line"></div>
+        <p>Printed Name: {{renter_name}}</p>
+        <p>Signature: _______________________</p>
+        <p>Date: _______________________</p>
+    </div>
+
+    <div class="signature-block">
+        <h3>WITNESS (Optional but Recommended)</h3>
+        <div class="signature-line"></div>
+        <p>Witness Name: _______________________</p>
+        <p>Witness Signature: _______________________</p>
+        <p>Date: _______________________</p>
+    </div>
+
+    <div style="margin-top: 50px; padding-top: 20px; border-top: 2px solid #d1d5db; font-size: 12px; color: #666; text-align: center;">
+        <p>This waiver was generated by The Wild Share platform (www.thewildshare.com)</p>
+        <p>Booking ID: {{booking_id}} | Generated: {{generated_date}}</p>
+    </div>
+</body>
+</html>
+

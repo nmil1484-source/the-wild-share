@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label.jsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet } from 'lucide-react'
+import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet, FileText, Download } from 'lucide-react'
 import './App.css'
 import { authAPI, equipmentAPI, bookingsAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
@@ -1304,6 +1304,32 @@ function App() {
                       </div>
                     </div>
                   </CardHeader>
+                  <CardFooter className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(`/api/contracts/rental-agreement/${booking.id}`, '_blank')}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Rental Agreement
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(`/api/contracts/liability-waiver/${booking.id}`, '_blank')}
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      Liability Waiver
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(`/api/contracts/all/${booking.id}`, '_blank')}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Download All
+                    </Button>
+                  </CardFooter>
                 </Card>
               ))}
               {myBookings.length === 0 && (

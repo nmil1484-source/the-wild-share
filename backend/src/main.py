@@ -25,6 +25,7 @@ from src.routes.stripe_connect import stripe_connect_bp
 from src.routes.messages import messages_bp
 from src.routes.upload import upload_bp
 from src.routes.verification import verification_bp
+from src.routes.contracts import contracts_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
@@ -95,6 +96,7 @@ app.register_blueprint(stripe_connect_bp, url_prefix='/api/stripe')
 app.register_blueprint(messages_bp, url_prefix='/api')
 app.register_blueprint(upload_bp, url_prefix='/api')
 app.register_blueprint(verification_bp, url_prefix='/api')
+app.register_blueprint(contracts_bp, url_prefix='/api')
 
 # Serve static assets (CSS, JS, images)
 @app.route('/assets/<path:path>')
