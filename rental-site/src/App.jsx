@@ -101,8 +101,8 @@ function App() {
     },
     {
       icon: Shield,
-      title: '50% Deposit Protection',
-      description: 'Secure deposits refunded after equipment return'
+      title: 'Deposit Protection',
+      description: 'Secure deposits held and refunded after equipment return'
     },
     {
       icon: Clock,
@@ -1048,10 +1048,11 @@ function App() {
                       placeholder="e.g., 1000Wh capacity, 2000W output"
                       value={equipmentForm.capacity_spec}
                       onChange={(e) => setEquipmentForm({...equipmentForm, capacity_spec: e.target.value})}
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="equipment_images">Equipment Photos (Up to 5)</Label>
+                    <Label htmlFor="equipment_images">Equipment Photos (Up to 5) *</Label>
                     <div className="mt-2">
                       <Input
                         id="equipment_images"
@@ -1060,6 +1061,7 @@ function App() {
                         multiple
                         onChange={handleImageSelect}
                         className="cursor-pointer"
+                        required={imagePreviewUrls.length === 0}
                       />
                       <p className="text-sm text-slate-500 mt-1">Max 5 images, 5MB each (PNG, JPG, GIF, WEBP)</p>
                     </div>
