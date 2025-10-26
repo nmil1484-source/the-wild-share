@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Textarea } from '@/components/ui/textarea.jsx'
 import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet, FileText, Download } from 'lucide-react'
 import './App.css'
-import { authAPI, equipmentAPI, bookingsAPI } from './lib/api'
+import { authAPI, equipmentAPI, bookingsAPI, identityAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
 
 function App() {
@@ -253,6 +253,20 @@ function App() {
       setLoading(false)
     }
   }
+
+  const handleStartVerification = async () => {
+    setLoading(true);
+    try {
+      const response = await identityAPI.createVerificationSession();
+      // Open Stripe Identity verification in new window
+      window.open(response.data.url, '_blank');
+      alert('Verification window opened! Complete the verification process and then refresh this page.');
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to start verification');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('access_token')
@@ -1512,6 +1526,52 @@ function App() {
                     {loading ? 'Saving...' : 'Save Profile Changes'}
                   </Button>
                 </form>
+              </CardContent>
+            </Card>
+
+            {/* Identity Verification Card */}
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle>Identity Verification</CardTitle>
+                <CardDescription>
+                  {user.is_identity_verified 
+                    ? 'Your identity has been verified'
+                    : 'Verify your identity to build trust and unlock premium features'}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {user.is_identity_verified ? (
+                  <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-lg border border-emerald-200">
+                    <Shield className="h-6 w-6 text-emerald-600" />
+                    <div>
+                      <p className="font-semibold text-emerald-900">Identity Verified</p>
+                      <p className="text-sm text-emerald-700">Your identity has been confirmed</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <p className="text-sm text-blue-900 font-semibold mb-2">Why verify your identity?</p>
+                      <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                        <li>Build trust with equipment owners</li>
+                        <li>Required for high-value rentals ($500+)</li>
+                        <li>Get priority in booking requests</li>
+                        <li>Unlock verified badge on your profile</li>
+                      </ul>
+                    </div>
+                    <Button 
+                      onClick={handleStartVerification}
+                      disabled={loading}
+                      className="w-full"
+                    >
+                      <Shield className="h-4 w-4 mr-2" />
+                      {loading ? 'Starting Verification...' : 'Verify My Identity'}
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center">
+                      Powered by Stripe Identity • Secure & Private • Takes 2-3 minutes
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 

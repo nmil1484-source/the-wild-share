@@ -58,5 +58,11 @@ export const paymentsAPI = {
   getBookingPayments: (bookingId) => api.get(`/bookings/${bookingId}/payments`),
 };
 
+// Identity Verification API
+export const identityAPI = {
+  createVerificationSession: () => api.post('/identity/create-verification-session'),
+  getVerificationStatus: () => api.get('/identity/verification-status'),
+};
+
 export default api;
 
