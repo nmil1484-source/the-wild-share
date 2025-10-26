@@ -931,6 +931,30 @@ function App() {
               <h2 className="text-3xl font-bold">My Equipment</h2>
             </div>
 
+            {/* Stripe Connect Banner */}
+            {user && !user.stripe_account_id && (
+              <Card className="mb-8 border-emerald-500 bg-emerald-50">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-4">
+                    <AlertTriangle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-lg mb-2">Connect Stripe to Accept Payments</h3>
+                      <p className="text-sm text-slate-600 mb-4">
+                        To receive payments for your equipment rentals, you need to connect your bank account through Stripe. 
+                        This secure process takes just a few minutes and allows you to receive 90% of each rental payment directly to your bank account.
+                      </p>
+                      <Button 
+                        onClick={() => window.location.href = '/api/payments/connect/onboard'}
+                        className="bg-emerald-600 hover:bg-emerald-700"
+                      >
+                        Connect Stripe Account
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Create Equipment Form */}
             <Card className="mb-8">
               <CardHeader>
