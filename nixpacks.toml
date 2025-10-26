@@ -1,3 +1,14 @@
+[phases.setup]
+nixPkgs = ["python310", "nodejs-18_x", "pnpm"]
+
+[phases.build]
+cmds = [
+    "cd rental-site && pnpm install",
+    "cd rental-site && VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY pnpm run build",
+    "rm -rf backend/src/static/*",
+    "cp -r rental-site/dist/* backend/src/static/"
+]
+
 [start]
-cmd = "gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --log-level debug --access-logfile - --error-logfile - wsgi:app"
+cmd = "cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --log-level debug --access-logfile - --error-logfile - wsgi:app"
 
