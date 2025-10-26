@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from src.models.user import db, User
+from src.utils.email import send_password_reset_email
 
 auth_bp = Blueprint('auth', __name__)
 # Using werkzeug for password hashing
@@ -173,16 +174,18 @@ def request_password_reset():
         'expires_at': datetime.utcnow() + timedelta(minutes=15)
     }
     
-    # In production, send email with reset link
-    # For now, return the token (for testing)
+    # Generate reset link
     reset_link = f"https://www.thewildshare.com/reset-password?token={reset_token}"
     
-    # TODO: Send email with reset_link
-    # For development, we'll return it in the response
+    # Send password reset email
+    email_sent = send_password_reset_email(user.email, reset_link)
+    
+    if not email_sent:
+        print(f"Warning: Failed to send password reset email to {user.email}")
+        # Still return success to avoid revealing if email exists
+    
     return jsonify({
-        'message': 'If an account with that email exists, a password reset link has been sent.',
-        'reset_link': reset_link,  # Remove this in production
-        'token': reset_token  # Remove this in production
+        'message': 'If an account with that email exists, a password reset link has been sent.'
     }), 200
 
 @auth_bp.route('/reset-password', methods=['POST'])
