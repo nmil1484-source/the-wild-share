@@ -11,7 +11,7 @@ payments_bp = Blueprint('payments', __name__)
 
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', 'sk_test_placeholder')
 
-PLATFORM_COMMISSION_RATE = 0.12  # 12% platform commission
+PLATFORM_COMMISSION_RATE = 0.10  # 10% platform commission
 
 @payments_bp.route('/create-payment-intent', methods=['POST'])
 @jwt_required()
@@ -101,8 +101,8 @@ def create_payment_intent():
             'owner_receives': owner_payout,
             'breakdown': {
                 'rental_cost': booking.total_cost,
-                'platform_commission_12_percent': platform_fee,
-                'owner_payout_88_percent': owner_payout,
+                'platform_commission_10_percent': platform_fee,
+                'owner_payout_90_percent': owner_payout,
                 'deposit_held': booking.deposit_amount
             }
         }), 200
@@ -144,7 +144,7 @@ def confirm_payment():
     
     return jsonify({
         'message': 'Payment confirmed successfully',
-        'note': 'Owner will receive their payout (88% of rental cost) automatically to their bank account',
+        'note': 'Owner will receive their payout (90% of rental cost) automatically to their bank account',
         'booking': booking.to_dict() if booking else None
     }), 200
 
@@ -273,8 +273,8 @@ def get_booking_payments(booking_id):
         'payments': [payment.to_dict() for payment in payments],
         'breakdown': {
             'total_rental_cost': booking.total_cost,
-            'platform_commission_12_percent': round(platform_fee, 2),
-            'owner_receives_88_percent': round(owner_payout, 2),
+            'platform_commission_10_percent': round(platform_fee, 2),
+            'owner_receives_90_percent': round(owner_payout, 2),
             'deposit_amount': booking.deposit_amount
         }
     }), 200
@@ -308,8 +308,8 @@ def get_my_earnings():
     return jsonify({
         'total_bookings': total_bookings,
         'gross_revenue': round(total_revenue, 2),
-        'platform_fees_12_percent': round(platform_fees, 2),
-        'net_earnings_88_percent': round(net_earnings, 2),
+        'platform_fees_10_percent': round(platform_fees, 2),
+        'net_earnings_90_percent': round(net_earnings, 2),
         'stripe_account_connected': user.stripe_onboarding_complete,
         'note': 'Earnings are automatically transferred to your bank account within 2-7 business days'
     }), 200

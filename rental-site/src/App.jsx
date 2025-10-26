@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea.jsx'
 import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet } from 'lucide-react'
 import './App.css'
 import { authAPI, equipmentAPI, bookingsAPI } from './lib/api'
+import StripeCheckout from './components/StripeCheckout'
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -78,6 +79,10 @@ function App() {
     start_date: '',
     end_date: ''
   })
+  const [showBookingDialog, setShowBookingDialog] = useState(false)
+  const [selectedEquipment, setSelectedEquipment] = useState(null)
+  const [currentBooking, setCurrentBooking] = useState(null)
+  const [showCheckout, setShowCheckout] = useState(false)
 
   const categories = [
     { id: 'all', name: 'All Equipment', icon: Mountain },
@@ -434,35 +439,54 @@ function App() {
     // Show rental agreement
     const agreementText = `RENTAL AGREEMENT\n\nBy proceeding with this booking, you agree to the following terms:\n\n1. LIABILITY: The renter assumes ALL responsibility for the equipment during the rental period.\n\n2. DAMAGE: The renter is responsible for any damage, loss, or theft of the equipment.\n\n3. DEPOSIT: A 50% security deposit will be charged and refunded upon safe return of the equipment in its original condition.\n\n4. INSURANCE: The renter is responsible for obtaining appropriate insurance coverage if desired.\n\n5. PROPER USE: Equipment must be used only for its intended purpose and in accordance with all safety guidelines.\n\n6. RETURN: Equipment must be returned on time and in the same condition as received (normal wear and tear excepted).\n\nDo you agree to these terms?`
     
-    if (!confirm(agreementText)) {
-      return
-    }
+    const handleCreateBooking = async (equipmentId) => {
+    const equipment = filteredEquipment.find(e => e.id === equipmentId)
+    setSelectedEquipment(equipment)
+    setBookingForm({ ...bookingForm, equipment_id: equipmentId })
+    setShowBookingDialog(true)
+  }
 
-    const startDate = prompt('Enter start date (DD-MM-YYYY):')
-    const endDate = prompt('Enter end date (DD-MM-YYYY):')
+  const handleSubmitBooking = async (e) => {
+    e.preventDefault()
     
-    if (!startDate || !endDate) return
-
-    // Convert DD-MM-YYYY to YYYY-MM-DD for API
-    const convertDate = (dateStr) => {
-      const [day, month, year] = dateStr.split('-')
-      return `${year}-${month}-${day}`
+    if (!bookingForm.start_date || !bookingForm.end_date) {
+      alert('Please select both start and end dates')
+      return
     }
 
     setLoading(true)
     try {
       const response = await bookingsAPI.create({
-        equipment_id: equipmentId,
-        start_date: convertDate(startDate),
-        end_date: convertDate(endDate)
+        equipment_id: bookingForm.equipment_id,
+        start_date: bookingForm.start_date,
+        end_date: bookingForm.end_date
       })
-      alert(`Booking created! Total: $${response.data.booking.total_cost.toFixed(2)} + $${response.data.booking.deposit_amount.toFixed(2)} deposit`)
-      loadMyBookings()
+      
+      setCurrentBooking(response.data.booking)
+      setShowBookingDialog(false)
+      setShowCheckout(true)
     } catch (error) {
       alert(error.response?.data?.error || 'Failed to create booking')
     } finally {
       setLoading(false)
     }
+  }
+
+  const handlePaymentSuccess = async () => {
+    setShowCheckout(false)
+    setCurrentBooking(null)
+    setSelectedEquipment(null)
+    setBookingForm({ equipment_id: null, start_date: '', end_date: '' })
+    alert('Payment successful! Your booking is confirmed.')
+    await loadMyBookings()
+    setCurrentView('bookings')
+  }
+
+  const handleCancelCheckout = () => {
+    setShowCheckout(false)
+    setCurrentBooking(null)
+    setSelectedEquipment(null)
+    setBookingForm({ equipment_id: null, start_date: '', end_date: '' })
   }
 
   const handleUpdateProfile = async (e) => {
@@ -2048,6 +2072,78 @@ function App() {
           </div>
         )}
       </div>
+
+      {/* Booking Dialog */}
+      <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Book {selectedEquipment?.name}</DialogTitle>
+            <DialogDescription>
+              Select your rental dates
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSubmitBooking} className="space-y-4">
+            <div>
+              <Label htmlFor="start_date">Start Date</Label>
+              <Input
+                id="start_date"
+                type="date"
+                value={bookingForm.start_date}
+                onChange={(e) => setBookingForm({...bookingForm, start_date: e.target.value})}
+                required
+                min={new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            <div>
+              <Label htmlFor="end_date">End Date</Label>
+              <Input
+                id="end_date"
+                type="date"
+                value={bookingForm.end_date}
+                onChange={(e) => setBookingForm({...bookingForm, end_date: e.target.value})}
+                required
+                min={bookingForm.start_date || new Date().toISOString().split('T')[0]}
+              />
+            </div>
+            {selectedEquipment && (
+              <div className="bg-muted p-4 rounded-lg space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Daily Rate:</span>
+                  <span className="font-medium">${selectedEquipment.daily_price}/day</span>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Total cost will be calculated based on rental duration + 50% security deposit
+                </div>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <Button type="button" variant="outline" onClick={() => setShowBookingDialog(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading} className="flex-1">
+                {loading ? 'Creating...' : 'Continue to Payment'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Checkout Dialog */}
+      <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Complete Payment</DialogTitle>
+          </DialogHeader>
+          {currentBooking && selectedEquipment && (
+            <StripeCheckout
+              booking={currentBooking}
+              equipment={selectedEquipment}
+              onSuccess={handlePaymentSuccess}
+              onCancel={handleCancelCheckout}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer className="bg-slate-900 text-white py-12">
