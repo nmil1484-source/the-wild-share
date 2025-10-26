@@ -436,6 +436,10 @@ function App() {
       return
     }
 
+    // Show rental agreement
+    const agreementText = `RENTAL AGREEMENT\n\nBy proceeding with this booking, you agree to the following terms:\n\n1. LIABILITY: The renter assumes ALL responsibility for the equipment during the rental period.\n\n2. DAMAGE: The renter is responsible for any damage, loss, or theft of the equipment.\n\n3. DEPOSIT: A 50% security deposit will be charged and refunded upon safe return of the equipment in its original condition.\n\n4. INSURANCE: The renter is responsible for obtaining appropriate insurance coverage if desired.\n\n5. PROPER USE: Equipment must be used only for its intended purpose and in accordance with all safety guidelines.\n\n6. RETURN: Equipment must be returned on time and in the same condition as received (normal wear and tear excepted).\n\nDo you agree to these terms?`
+    
+    const handleCreateBooking = async (equipmentId) => {
     const equipment = filteredEquipment.find(e => e.id === equipmentId)
     setSelectedEquipment(equipment)
     setBookingForm({ ...bookingForm, equipment_id: equipmentId })
@@ -2069,50 +2073,6 @@ function App() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-white py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Mountain className="h-6 w-6" />
-                <span className="text-xl font-bold">The Wild Share</span>
-              </div>
-              <p className="text-slate-400">
-                Share the adventure. Rent premium outdoor gear or list your equipment.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Equipment</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li>Power Solutions</li>
-                <li>Connectivity</li>
-                <li>Recreation Gear</li>
-                <li>Camping Equipment</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><button onClick={() => setCurrentView('about')} className="hover:text-white transition-colors">About Us</button></li>
-                <li><button onClick={() => setCurrentView('contact')} className="hover:text-white transition-colors">Contact</button></li>
-                <li><button onClick={() => setCurrentView('terms')} className="hover:text-white transition-colors">Rental Terms</button></li>
-                <li><button onClick={() => setCurrentView('faq')} className="hover:text-white transition-colors">FAQ</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Contact</h4>
-              <ul className="space-y-2 text-slate-400">
-                <li><a href="mailto:thewildshare@gmail.com" className="hover:text-white transition-colors">thewildshare@gmail.com</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
-            <p>&copy; 2025 The Wild Share. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-
       {/* Booking Dialog */}
       <Dialog open={showBookingDialog} onOpenChange={setShowBookingDialog}>
         <DialogContent className="sm:max-w-md">
@@ -2184,8 +2144,53 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Mountain className="h-6 w-6" />
+                <span className="text-xl font-bold">The Wild Share</span>
+              </div>
+              <p className="text-slate-400">
+                Share the adventure. Rent premium outdoor gear or list your equipment.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Equipment</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li>Power Solutions</li>
+                <li>Connectivity</li>
+                <li>Recreation Gear</li>
+                <li>Camping Equipment</li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Company</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li><button onClick={() => setCurrentView('about')} className="hover:text-white transition-colors">About Us</button></li>
+                <li><button onClick={() => setCurrentView('contact')} className="hover:text-white transition-colors">Contact</button></li>
+                <li><button onClick={() => setCurrentView('terms')} className="hover:text-white transition-colors">Rental Terms</button></li>
+                <li><button onClick={() => setCurrentView('faq')} className="hover:text-white transition-colors">FAQ</button></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Contact</h4>
+              <ul className="space-y-2 text-slate-400">
+                <li><a href="mailto:thewildshare@gmail.com" className="hover:text-white transition-colors">thewildshare@gmail.com</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-slate-800 mt-8 pt-8 text-center text-slate-400">
+            <p>&copy; 2025 The Wild Share. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
 
 export default App
+
