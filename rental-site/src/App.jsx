@@ -33,6 +33,7 @@ function App() {
 
   // Auth form state
   const [authForm, setAuthForm] = useState({
+    terms_agreed: false,
     email: '',
     password: '',
     first_name: '',
@@ -201,6 +202,10 @@ function App() {
   }
 
   const handleAuth = async (e) => {
+    if (authMode === 'register' && !authForm.terms_agreed) {
+      alert('You must agree to the Terms of Service and Privacy Policy to create an account.');
+      return;
+    }
     e.preventDefault()
     setLoading(true)
     try {
@@ -693,6 +698,16 @@ function App() {
                       >
                         Forgot password?
                       </Button>
+                    )}
+                                        {authMode === 'register' && (
+                      <div className="flex items-center space-x-2 mt-4">
+                        <input type="checkbox" id="terms" checked={authForm.terms_agreed} onChange={(e) => setAuthForm({ ...authForm, terms_agreed: e.target.checked })} />
+                        <Label htmlFor="terms" className="text-sm font-normal text-muted-foreground">
+                          I agree to the{" "}
+                          <a href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="underline">Terms of Service</a> and{" "}
+                          <a href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>.
+                        </Label>
+                      </div>
                     )}
                     <Button
                       type="button"
@@ -2150,6 +2165,8 @@ function App() {
                 <li><button onClick={() => setCurrentView('contact')} className="hover:text-white transition-colors">Contact</button></li>
                 <li><button onClick={() => setCurrentView('terms')} className="hover:text-white transition-colors">Rental Terms</button></li>
                 <li><button onClick={() => setCurrentView('faq')} className="hover:text-white transition-colors">FAQ</button></li>
+                <li><a href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy Policy</a></li>
               </ul>
             </div>
             <div>
