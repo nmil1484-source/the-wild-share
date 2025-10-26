@@ -58,6 +58,15 @@ export const paymentsAPI = {
   getBookingPayments: (bookingId) => api.get(`/bookings/${bookingId}/payments`),
 };
 
+// Messages API
+export const messagesAPI = {
+  sendMessage: (equipmentId, message) => api.post(`/equipment/${equipmentId}/messages`, { message }),
+  getEquipmentMessages: (equipmentId) => api.get(`/equipment/${equipmentId}/messages`),
+  getMyMessages: () => api.get('/messages'),
+  getUnreadCount: () => api.get('/messages/unread-count'),
+  markAsRead: (messageId) => api.put(`/messages/${messageId}/read`),
+};
+
 // Identity Verification API
 export const identityAPI = {
   createVerificationSession: () => api.post('/identity/create-verification-session'),

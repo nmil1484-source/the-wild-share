@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label.jsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet, FileText, Download } from 'lucide-react'
+import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet, FileText, Download, Mail, Send } from 'lucide-react'
 import './App.css'
-import { authAPI, equipmentAPI, bookingsAPI, identityAPI } from './lib/api'
+import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
 
 function App() {
@@ -84,6 +84,11 @@ function App() {
   const [selectedEquipment, setSelectedEquipment] = useState(null)
   const [currentBooking, setCurrentBooking] = useState(null)
   const [showCheckout, setShowCheckout] = useState(false)
+  const [conversations, setConversations] = useState([])
+  const [unreadCount, setUnreadCount] = useState(0)
+  const [selectedConversation, setSelectedConversation] = useState(null)
+  const [conversationMessages, setConversationMessages] = useState([])
+  const [newMessage, setNewMessage] = useState('')
 
   const categories = [
     { id: 'all', name: 'All Equipment', icon: Mountain },
@@ -163,6 +168,8 @@ function App() {
         loadMyEquipment()
       }
       loadMyBookings()
+      loadMessages()
+      loadUnreadCount()
     } catch (error) {
       console.error('Failed to load user:', error)
       localStorage.removeItem('access_token')
@@ -190,6 +197,53 @@ function App() {
       setMyEquipment([])
     }
   }
+
+  const loadMessages = async () => {
+    try {
+      const response = await messagesAPI.getMyMessages();
+      setConversations(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Failed to load messages:', error);
+      setConversations([]);
+    }
+  };
+
+  const loadUnreadCount = async () => {
+    try {
+      const response = await messagesAPI.getUnreadCount();
+      setUnreadCount(response.data.unread_count || 0);
+    } catch (error) {
+      console.error('Failed to load unread count:', error);
+    }
+  };
+
+  const loadConversationMessages = async (equipmentId) => {
+    try {
+      const response = await messagesAPI.getEquipmentMessages(equipmentId);
+      setConversationMessages(Array.isArray(response.data) ? response.data : []);
+    } catch (error) {
+      console.error('Failed to load conversation messages:', error);
+      setConversationMessages([]);
+    }
+  };
+
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedConversation) return;
+    
+    setLoading(true);
+    try {
+      await messagesAPI.sendMessage(selectedConversation.equipment_id, newMessage);
+      setNewMessage('');
+      await loadConversationMessages(selectedConversation.equipment_id);
+      await loadMessages();
+      await loadUnreadCount();
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to send message');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const loadMyBookings = async () => {
     try {
@@ -605,6 +659,15 @@ function App() {
                 </Button>
                 <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setCurrentView('bookings')}>
                   My Bookings
+                </Button>
+                <Button variant="ghost" className="text-white hover:bg-white/20 relative" onClick={() => setCurrentView('messages')}>
+                  <Mail className="h-4 w-4 mr-2" />
+                  Messages
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Button>
                 {(user.user_type === 'owner' || user.user_type === 'both') && (
                   <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setCurrentView('equipment')}>
@@ -1366,6 +1429,109 @@ function App() {
                   No bookings yet. Browse equipment to make your first booking!
                 </p>
               )}
+            </div>
+          </div>
+        )}
+
+        {currentView === 'messages' && user && (
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold mb-8">Messages</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Conversations List */}
+              <div className="md:col-span-1">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Conversations</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {conversations.length === 0 ? (
+                      <p className="text-center text-muted-foreground py-8 px-4">No messages yet</p>
+                    ) : (
+                      <div className="divide-y">
+                        {conversations.map((conv) => (
+                          <button
+                            key={`${conv.equipment_id}_${conv.partner_id}`}
+                            onClick={() => {
+                              setSelectedConversation(conv);
+                              loadConversationMessages(conv.equipment_id);
+                            }}
+                            className={`w-full text-left p-4 hover:bg-slate-50 transition-colors ${
+                              selectedConversation?.equipment_id === conv.equipment_id && selectedConversation?.partner_id === conv.partner_id
+                                ? 'bg-emerald-50'
+                                : ''
+                            }`}
+                          >
+                            <div className="flex justify-between items-start mb-1">
+                              <p className="font-semibold text-sm">{conv.partner_name}</p>
+                              {conv.unread_count > 0 && (
+                                <span className="bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                                  {conv.unread_count}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-muted-foreground mb-1">{conv.equipment_name}</p>
+                            <p className="text-xs text-muted-foreground truncate">{conv.last_message}</p>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Message Thread */}
+              <div className="md:col-span-2">
+                <Card className="h-[600px] flex flex-col">
+                  {selectedConversation ? (
+                    <>
+                      <CardHeader>
+                        <CardTitle>{selectedConversation.partner_name}</CardTitle>
+                        <CardDescription>About: {selectedConversation.equipment_name}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
+                        {conversationMessages.map((msg) => (
+                          <div
+                            key={msg.id}
+                            className={`flex ${
+                              msg.sender_id === user.id ? 'justify-end' : 'justify-start'
+                            }`}
+                          >
+                            <div
+                              className={`max-w-[70%] rounded-lg p-3 ${
+                                msg.sender_id === user.id
+                                  ? 'bg-emerald-600 text-white'
+                                  : 'bg-slate-100 text-slate-900'
+                              }`}
+                            >
+                              <p className="text-sm">{msg.message}</p>
+                              <p className="text-xs mt-1 opacity-70">
+                                {new Date(msg.created_at).toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </CardContent>
+                      <CardFooter>
+                        <form onSubmit={handleSendMessage} className="flex w-full gap-2">
+                          <Input
+                            placeholder="Type your message..."
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            disabled={loading}
+                          />
+                          <Button type="submit" disabled={loading || !newMessage.trim()}>
+                            <Send className="h-4 w-4" />
+                          </Button>
+                        </form>
+                      </CardFooter>
+                    </>
+                  ) : (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-muted-foreground">Select a conversation to start messaging</p>
+                    </div>
+                  )}
+                </Card>
+              </div>
             </div>
           </div>
         )}
