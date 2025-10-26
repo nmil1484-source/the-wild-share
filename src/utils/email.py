@@ -17,6 +17,12 @@ def send_password_reset_email(to_email, reset_link):
     AWS_REGION = os.environ.get('AWS_REGION', 'us-east-2')
     SENDER_EMAIL = os.environ.get('SENDER_EMAIL', 'thewildshare@gmail.com')
     
+    print(f"[EMAIL DEBUG] Attempting to send email to: {to_email}")
+    print(f"[EMAIL DEBUG] From: {SENDER_EMAIL}")
+    print(f"[EMAIL DEBUG] Region: {AWS_REGION}")
+    print(f"[EMAIL DEBUG] AWS Access Key ID exists: {bool(os.environ.get('AWS_ACCESS_KEY_ID'))}")
+    print(f"[EMAIL DEBUG] AWS Secret Key exists: {bool(os.environ.get('AWS_SECRET_ACCESS_KEY'))}")
+    
     # Create SES client
     ses_client = boto3.client(
         'ses',
@@ -109,13 +115,19 @@ def send_password_reset_email(to_email, reset_link):
             Source=SENDER_EMAIL,
         )
         
-        print(f"Email sent successfully! Message ID: {response['MessageId']}")
+        print(f"[EMAIL SUCCESS] Email sent successfully! Message ID: {response['MessageId']}")
+        print(f"[EMAIL SUCCESS] Sent to: {to_email}")
         return True
         
     except ClientError as e:
-        print(f"Error sending email: {e.response['Error']['Message']}")
+        print(f"[EMAIL ERROR] ClientError sending email: {e.response['Error']['Message']}")
+        print(f"[EMAIL ERROR] Error Code: {e.response['Error']['Code']}")
+        print(f"[EMAIL ERROR] Full response: {e.response}")
         return False
     except Exception as e:
-        print(f"Unexpected error sending email: {str(e)}")
+        print(f"[EMAIL ERROR] Unexpected error sending email: {str(e)}")
+        print(f"[EMAIL ERROR] Exception type: {type(e).__name__}")
+        import traceback
+        print(f"[EMAIL ERROR] Traceback: {traceback.format_exc()}")
         return False
 
