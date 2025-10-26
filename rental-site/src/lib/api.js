@@ -67,6 +67,15 @@ export const messagesAPI = {
   markAsRead: (messageId) => api.put(`/messages/${messageId}/read`),
 };
 
+// Reviews API
+export const reviewsAPI = {
+  createReview: (bookingId, data) => api.post(`/bookings/${bookingId}/review`, data),
+  getEquipmentReviews: (equipmentId) => api.get(`/equipment/${equipmentId}/reviews`),
+  getUserReviews: (userId) => api.get(`/users/${userId}/reviews`),
+  getMyReviews: () => api.get('/my-reviews'),
+  canReview: (bookingId) => api.get(`/bookings/${bookingId}/can-review`),
+};
+
 // Identity Verification API
 export const identityAPI = {
   createVerificationSession: () => api.post('/identity/create-verification-session'),

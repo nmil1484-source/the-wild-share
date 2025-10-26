@@ -16,6 +16,7 @@ class Equipment(db.Model):
     image_urls = db.Column(db.Text)  # JSON array of multiple image URLs
     location = db.Column(db.String(255))  # City, State or full address
     is_available = db.Column(db.Boolean, default=True)
+    average_rating = db.Column(db.Float, default=0.0)  # Average rating from reviews
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

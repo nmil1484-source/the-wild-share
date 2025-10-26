@@ -7,9 +7,9 @@ import { Label } from '@/components/ui/label.jsx'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.jsx'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog.jsx'
 import { Textarea } from '@/components/ui/textarea.jsx'
-import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet, FileText, Download, Mail, Send } from 'lucide-react'
+import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calendar, Shield, Clock, User, LogOut, Plus, Edit, Trash2, Settings, Upload, AlertTriangle, Bike, Backpack, Droplet, FileText, Download, Mail, Send, Star } from 'lucide-react'
 import './App.css'
-import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI } from './lib/api'
+import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI, reviewsAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
 
 function App() {
@@ -89,6 +89,14 @@ function App() {
   const [selectedConversation, setSelectedConversation] = useState(null)
   const [conversationMessages, setConversationMessages] = useState([])
   const [newMessage, setNewMessage] = useState('')
+  const [showReviewDialog, setShowReviewDialog] = useState(false)
+  const [reviewingBooking, setReviewingBooking] = useState(null)
+  const [reviewForm, setReviewForm] = useState({
+    equipment_rating: 5,
+    owner_rating: 5,
+    equipment_review: '',
+    owner_review: ''
+  })
 
   const categories = [
     { id: 'all', name: 'All Equipment', icon: Mountain },
@@ -224,6 +232,30 @@ function App() {
     } catch (error) {
       console.error('Failed to load conversation messages:', error);
       setConversationMessages([]);
+    }
+  };
+
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (!reviewingBooking) return;
+    
+    setLoading(true);
+    try {
+      await reviewsAPI.createReview(reviewingBooking.id, reviewForm);
+      alert('Review submitted successfully!');
+      setShowReviewDialog(false);
+      setReviewingBooking(null);
+      setReviewForm({
+        equipment_rating: 5,
+        owner_rating: 5,
+        equipment_review: '',
+        owner_review: ''
+      });
+      await loadMyBookings();
+    } catch (error) {
+      alert(error.response?.data?.error || 'Failed to submit review');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -1396,7 +1428,20 @@ function App() {
                       </div>
                     </div>
                   </CardHeader>
-                  <CardFooter className="flex gap-2">
+                  <CardFooter className="flex gap-2 flex-wrap">
+                    {booking.status === 'completed' && !booking.has_review && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => {
+                          setReviewingBooking(booking);
+                          setShowReviewDialog(true);
+                        }}
+                      >
+                        <Star className="h-4 w-4 mr-2" />
+                        Leave Review
+                      </Button>
+                    )}
                     <Button
                       variant="outline"
                       size="sm"
@@ -2464,6 +2509,107 @@ function App() {
       </Dialog>
 
       {/* Checkout Dialog */}
+      {/* Review Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Leave a Review</DialogTitle>
+            <DialogDescription>
+              Share your experience with this equipment and owner
+            </DialogDescription>
+          </DialogHeader>
+          {reviewingBooking && (
+            <form onSubmit={handleSubmitReview} className="space-y-6">
+              {/* Equipment Rating */}
+              <div>
+                <Label>Equipment Rating</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => setReviewForm({...reviewForm, equipment_rating: rating})}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          rating <= reviewForm.equipment_rating
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {reviewForm.equipment_rating} / 5
+                  </span>
+                </div>
+              </div>
+
+              {/* Equipment Review Text */}
+              <div>
+                <Label htmlFor="equipment_review">Equipment Review (Optional)</Label>
+                <Textarea
+                  id="equipment_review"
+                  placeholder="Tell others about the equipment condition, quality, etc."
+                  value={reviewForm.equipment_review}
+                  onChange={(e) => setReviewForm({...reviewForm, equipment_review: e.target.value})}
+                  rows={3}
+                />
+              </div>
+
+              {/* Owner Rating */}
+              <div>
+                <Label>Owner Rating</Label>
+                <div className="flex items-center gap-2 mt-2">
+                  {[1, 2, 3, 4, 5].map((rating) => (
+                    <button
+                      key={rating}
+                      type="button"
+                      onClick={() => setReviewForm({...reviewForm, owner_rating: rating})}
+                      className="focus:outline-none"
+                    >
+                      <Star
+                        className={`h-8 w-8 ${
+                          rating <= reviewForm.owner_rating
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="ml-2 text-sm text-muted-foreground">
+                    {reviewForm.owner_rating} / 5
+                  </span>
+                </div>
+              </div>
+
+              {/* Owner Review Text */}
+              <div>
+                <Label htmlFor="owner_review">Owner Review (Optional)</Label>
+                <Textarea
+                  id="owner_review"
+                  placeholder="Tell others about your experience with the owner (communication, pickup, etc.)"
+                  value={reviewForm.owner_review}
+                  onChange={(e) => setReviewForm({...reviewForm, owner_review: e.target.value})}
+                  rows={3}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex gap-2 justify-end">
+                <Button type="button" variant="outline" onClick={() => setShowReviewDialog(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Submitting...' : 'Submit Review'}
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showCheckout} onOpenChange={setShowCheckout}>
         <DialogContent className="sm:max-w-3xl">
           <DialogHeader>
