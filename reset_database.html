@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Reset - The Wild Share Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .stats-box {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        
+        .warning-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .warning-box p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+        }
+        
+        .btn-danger:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .result-box.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .result-box.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ Database Reset</h1>
+        <p class="subtitle">The Wild Share Admin Tool</p>
+        
+        <div class="stats-box" id="statsBox">
+            <h3>Current Database Stats</h3>
+            <div id="statsContent">
+                <p style="text-align: center; color: #999;">Loading...</p>
+            </div>
+        </div>
+        
+        <div class="warning-box">
+            <strong>⚠️ WARNING</strong>
+            <p>This will permanently delete ALL data from your database including users, equipment, bookings, messages, and reviews. This action cannot be undone!</p>
+        </div>
+        
+        <div class="input-group">
+            <label for="secretKey">Admin Secret Key</label>
+            <input 
+                type="password" 
+                id="secretKey" 
+                placeholder="Enter admin secret key"
+                autocomplete="off"
+            >
+            <p style="font-size: 12px; color: #999; margin-top: 5px;">
+                Secret: wildshare_admin_reset_2024
+            </p>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-secondary" onclick="loadStats()">Refresh Stats</button>
+            <button class="btn-danger" onclick="resetDatabase()" id="resetBtn">
+                Reset Database
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+        
+        <div class="result-box" id="resultBox"></div>
+    </div>
+    
+    <script>
+        const API_URL = window.location.origin;
+        
+        // Load stats on page load
+        window.addEventListener('DOMContentLoaded', loadStats);
+        
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/api/admin/stats`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.stats;
+                    document.getElementById('statsContent').innerHTML = `
+                        <div class="stat-item">
+                            <span class="stat-label">Users</span>
+                            <span class="stat-value">${stats.users}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Equipment</span>
+                            <span class="stat-value">${stats.equipment}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Bookings</span>
+                            <span class="stat-value">${stats.bookings}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Messages</span>
+                            <span class="stat-value">${stats.messages}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Reviews</span>
+                            <span class="stat-value">${stats.reviews}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Identity Verifications</span>
+                            <span class="stat-value">${stats.identity_verifications}</span>
+                        </div>
+                        <div class="stat-item" style="border-top: 2px solid #667eea; margin-top: 10px; padding-top: 10px;">
+                            <span class="stat-label"><strong>Total Records</strong></span>
+                            <span class="stat-value"><strong>${data.total_records}</strong></span>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('statsContent').innerHTML = `
+                    <p style="text-align: center; color: #dc3545;">Failed to load stats</p>
+                `;
+            }
+        }
+        
+        async function resetDatabase() {
+            const secret = document.getElementById('secretKey').value;
+            
+            if (!secret) {
+                showResult('error', 'Please enter the admin secret key');
+                return;
+            }
+            
+            if (!confirm('Are you ABSOLUTELY SURE you want to delete ALL data? This cannot be undone!')) {
+                return;
+            }
+            
+            if (!confirm('Last chance! This will permanently delete everything. Continue?')) {
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resetBtn').disabled = true;
+            document.getElementById('resultBox').style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_URL}/api/admin/reset-database`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ secret })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult('success', `
+                        <strong>✅ Database reset successfully!</strong><br><br>
+                        Deleted:<br>
+                        • ${data.deleted.users} users<br>
+                        • ${data.deleted.equipment} equipment<br>
+                        • ${data.deleted.bookings} bookings<br>
+                        • ${data.deleted.messages} messages<br>
+                        • ${data.deleted.reviews} reviews<br>
+                        • ${data.deleted.identity_verifications} identity verifications<br>
+                        <br>
+                        <strong>Total: ${data.total_deleted} records deleted</strong>
+                    `);
+                    
+                    // Reload stats
+                    setTimeout(loadStats, 1000);
+                } else {
+                    showResult('error', data.error || 'Failed to reset database');
+                }
+            } catch (error) {
+                showResult('error', `Error: ${error.message}`);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('resetBtn').disabled = false;
+            }
+        }
+        
+        function showResult(type, message) {
+            const resultBox = document.getElementById('resultBox');
+            resultBox.className = `result-box ${type}`;
+            resultBox.innerHTML = message;
+            resultBox.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
+
