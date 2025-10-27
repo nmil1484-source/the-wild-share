@@ -675,6 +675,11 @@ function App() {
       return true
     })
 
+  // If admin view, show admin dashboard only
+  if (currentView === 'admin' && user && user.is_admin) {
+    return <AdminDashboard user={user} onLogout={handleLogout} />
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Hero Section */}
@@ -2633,10 +2638,6 @@ function App() {
         </DialogContent>
       </Dialog>
 
-      {/* Admin Dashboard */}
-      {currentView === 'admin' && user && user.is_admin && (
-        <AdminDashboard user={user} onLogout={handleLogout} />
-      )}
     </div>
   )
 }
