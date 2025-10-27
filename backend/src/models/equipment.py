@@ -17,6 +17,13 @@ class Equipment(db.Model):
     location = db.Column(db.String(255))  # City, State or full address
     is_available = db.Column(db.Boolean, default=True)
     average_rating = db.Column(db.Float, default=0.0)  # Average rating from reviews
+    
+    # Moderation fields
+    approval_status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    approved_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    approved_at = db.Column(db.DateTime)
+    rejection_reason = db.Column(db.Text)
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     

@@ -25,6 +25,13 @@ class User(db.Model):
     is_credit_checked = db.Column(db.Boolean, default=False)
     verification_date = db.Column(db.DateTime)
     
+    # Admin and moderation fields
+    is_admin = db.Column(db.Boolean, default=False)
+    is_banned = db.Column(db.Boolean, default=False)
+    ban_reason = db.Column(db.Text)
+    banned_at = db.Column(db.DateTime)
+    banned_by = db.Column(db.Integer, db.ForeignKey('user.id'))
+    
     # Stripe Connect fields for equipment owners
     stripe_account_id = db.Column(db.String(255))  # Stripe Connect account ID
     stripe_onboarding_complete = db.Column(db.Boolean, default=False)

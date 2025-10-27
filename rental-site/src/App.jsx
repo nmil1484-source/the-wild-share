@@ -11,6 +11,7 @@ import { Mountain, Zap, Wifi, Sun, Waves, Tent, ChevronRight, ChevronLeft, Calen
 import './App.css'
 import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI, reviewsAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
+import AdminDashboard from './components/AdminDashboard'
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -713,6 +714,12 @@ function App() {
                   <User className="h-5 w-5" />
                   <span>{user.first_name}</span>
                 </button>
+                {user.is_admin && (
+                  <Button variant="outline" className="text-white border-white hover:bg-white/20" onClick={() => setCurrentView('admin')}>
+                    <Shield className="h-4 w-4 mr-2" />
+                    Admin
+                  </Button>
+                )}
                 <Button variant="secondary" size="sm" onClick={handleLogout}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Logout
@@ -2625,6 +2632,11 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Admin Dashboard */}
+      {currentView === 'admin' && user && user.is_admin && (
+        <AdminDashboard user={user} onLogout={handleLogout} />
+      )}
     </div>
   )
 }

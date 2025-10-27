@@ -35,6 +35,7 @@ from src.routes.availability import availability_bp
 from src.routes.dashboard import dashboard_bp
 from src.routes.sample_contract import sample_contract_bp
 from src.routes.admin import admin_bp
+from src.routes.admin_moderation import admin_mod_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
@@ -113,6 +114,7 @@ app.register_blueprint(availability_bp, url_prefix='/api')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(sample_contract_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
+app.register_blueprint(admin_mod_bp, url_prefix='/api')
 
 # Serve static assets (CSS, JS, images)
 @app.route('/assets/<path:path>')
