@@ -33,7 +33,25 @@ class Equipment(db.Model):
     def __repr__(self):
         return f'<Equipment {self.name}>'
 
-    def to_dict(self):
+    def to_dict(self, include_full_owner=False):
+        # Public owner info (safe to show on listings)
+        owner_info = None
+        if self.owner:
+            if include_full_owner:
+                owner_info = self.owner.to_dict()
+            else:
+                # Only show safe public info
+                first_name = self.owner.first_name or 'User'
+                last_initial = self.owner.last_name[0] + '.' if self.owner.last_name else ''
+                owner_info = {
+                    'id': self.owner.id,
+                    'name': f"{first_name} {last_initial}",
+                    'profile_image_url': self.owner.profile_image_url,
+                    'trust_level': self.owner.trust_level,
+                    'is_identity_verified': self.owner.is_identity_verified,
+                    'member_since': self.owner.created_at.isoformat() if self.owner.created_at else None
+                }
+        
         return {
             'id': self.id,
             'owner_id': self.owner_id,
@@ -49,6 +67,6 @@ class Equipment(db.Model):
             'location': self.location,
             'is_available': self.is_available,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'owner': self.owner.to_dict() if self.owner else None
+            'owner': owner_info
         }
 

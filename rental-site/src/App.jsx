@@ -1003,6 +1003,36 @@ function App() {
                     {item.location && (
                       <p className="text-sm text-muted-foreground mt-2">📍 {item.location}</p>
                     )}
+                    {/* Owner Info */}
+                    {item.owner && (
+                      <div className="flex items-center gap-2 mt-3 pt-3 border-t">
+                        {item.owner.profile_image_url ? (
+                          <img 
+                            src={item.owner.profile_image_url} 
+                            alt={item.owner.name}
+                            className="w-8 h-8 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center">
+                            <User className="h-4 w-4 text-slate-500" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <p className="text-sm font-medium truncate">{item.owner.name}</p>
+                            {item.owner.is_identity_verified && (
+                              <Shield className="h-3.5 w-3.5 text-emerald-600" title="Verified" />
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <span className="capitalize">{item.owner.trust_level || 'New'} Member</span>
+                            {item.owner.member_since && (
+                              <span>• Since {new Date(item.owner.member_since).getFullYear()}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
