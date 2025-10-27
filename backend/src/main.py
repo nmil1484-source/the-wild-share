@@ -112,7 +112,7 @@ app.register_blueprint(reviews_bp, url_prefix='/api')
 app.register_blueprint(availability_bp, url_prefix='/api')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(sample_contract_bp, url_prefix='/api')
-app.register_blueprint(admin_bp)
+app.register_blueprint(admin_bp, url_prefix='/api')
 
 # Serve static assets (CSS, JS, images)
 @app.route('/assets/<path:path>')

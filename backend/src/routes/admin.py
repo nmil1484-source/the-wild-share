@@ -13,7 +13,7 @@ admin_bp = Blueprint('admin', __name__)
 # Admin secret key - change this to something secure!
 ADMIN_SECRET = "wildshare_admin_reset_2024"
 
-@admin_bp.route('/api/admin/reset-database', methods=['POST'])
+@admin_bp.route('/admin/reset-database', methods=['POST'])
 def reset_database():
     """
     DANGER: This endpoint deletes ALL data from the database!
@@ -71,7 +71,7 @@ def reset_database():
             'error': f'Failed to reset database: {str(e)}'
         }), 500
 
-@admin_bp.route('/api/admin/stats', methods=['GET'])
+@admin_bp.route('/admin/stats', methods=['GET'])
 def get_stats():
     """
     Get current database statistics
