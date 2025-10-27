@@ -56,30 +56,39 @@ def download_rental_agreement(booking_id):
     total_paid = total_cost + deposit_amount
     
     # Prepare template data
+    platform_fee = total_cost * 0.10  # 10% platform fee
     data = {
-        'rental_date': datetime.now().strftime('%B %d, %Y'),
+        'booking_date': datetime.now().strftime('%B %d, %Y'),
         'owner_name': owner.name,
         'owner_email': owner.email,
         'owner_phone': owner.phone or 'Not provided',
+        'owner_address': 'Address on file',
         'renter_name': renter.name,
         'renter_email': renter.email,
         'renter_phone': renter.phone or 'Not provided',
+        'renter_address': 'Address on file',
         'equipment_name': equipment.name,
         'equipment_category': equipment.category,
-        'equipment_specs': equipment.specifications or 'See equipment listing',
+        'equipment_description': equipment.specifications or 'See equipment listing',
         'start_date': booking.start_date.strftime('%B %d, %Y'),
         'end_date': booking.end_date.strftime('%B %d, %Y'),
         'rental_days': rental_days,
-        'daily_rate': f'{equipment.daily_price:.2f}',
-        'total_cost': f'{total_cost:.2f}',
+        'daily_price': f'{equipment.daily_price:.2f}',
+        'subtotal': f'{total_cost:.2f}',
+        'platform_fee': f'{platform_fee:.2f}',
+        'total_cost': f'{total_cost + platform_fee:.2f}',
         'deposit_amount': f'{deposit_amount:.2f}',
-        'total_paid': f'{total_paid:.2f}',
+        'total_charged': f'{total_paid + platform_fee:.2f}',
         'booking_id': booking.id,
-        'generated_date': datetime.now().strftime('%B %d, %Y at %I:%M %p')
+        'payment_date': datetime.now().strftime('%B %d, %Y at %I:%M %p'),
+        'pickup_location': equipment.location or 'See equipment listing',
+        'pickup_datetime': booking.start_date.strftime('%B %d, %Y at 10:00 AM'),
+        'return_location': equipment.location or 'See equipment listing',
+        'return_datetime': booking.end_date.strftime('%B %d, %Y by 6:00 PM')
     }
     
     # Render the template
-    html_content = render_contract_template('rental_agreement.html', data)
+    html_content = render_contract_template('rental_agreement_short.html', data)
     
     # Convert to PDF
     pdf = HTML(string=html_content).write_pdf()
@@ -129,8 +138,9 @@ def download_liability_waiver(booking_id):
         'generated_date': datetime.now().strftime('%B %d, %Y at %I:%M %p')
     }
     
-    # Render the template
-    html_content = render_contract_template('liability_waiver.html', data)
+    # Note: The short template includes both rental agreement and liability waiver
+    # So we'll use the same template but with different data focus
+    html_content = render_contract_template('rental_agreement_short.html', data)
     
     # Convert to PDF
     pdf = HTML(string=html_content).write_pdf()
@@ -214,18 +224,14 @@ def download_all_contracts(booking_id):
         'generated_date': datetime.now().strftime('%B %d, %Y at %I:%M %p')
     }
     
-    # Generate PDFs
-    rental_html = render_contract_template('rental_agreement.html', rental_data)
+    # Generate PDF (short template includes both agreement and waiver)
+    rental_html = render_contract_template('rental_agreement_short.html', rental_data)
     rental_pdf = HTML(string=rental_html).write_pdf()
     
-    waiver_html = render_contract_template('liability_waiver.html', waiver_data)
-    waiver_pdf = HTML(string=waiver_html).write_pdf()
-    
-    # Create ZIP file
+    # Create ZIP file (short template includes both agreement and waiver in one PDF)
     zip_io = BytesIO()
     with ZipFile(zip_io, 'w') as zip_file:
-        zip_file.writestr(f'Rental_Agreement_{booking.id}.pdf', rental_pdf)
-        zip_file.writestr(f'Liability_Waiver_{booking.id}.pdf', waiver_pdf)
+        zip_file.writestr(f'Rental_Contract_{booking.id}.pdf', rental_pdf)
     
     zip_io.seek(0)
     

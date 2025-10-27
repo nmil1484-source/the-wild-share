@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            line-height: 1.3;
+            margin: 0.5in;
+            color: #000;
+        }
+        h1 {
+            text-align: center;
+            font-size: 16pt;
+            margin: 0 0 5px 0;
+            font-weight: bold;
+        }
+        h2 {
+            font-size: 12pt;
+            margin: 12px 0 6px 0;
+            font-weight: bold;
+            border-bottom: 2px solid #000;
+            padding-bottom: 2px;
+        }
+        h3 {
+            font-size: 11pt;
+            margin: 8px 0 4px 0;
+            font-weight: bold;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 10pt;
+            margin: 0 0 3px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 6px 0;
+            font-size: 9pt;
+        }
+        table, th, td {
+            border: 1px solid #000;
+        }
+        th, td {
+            padding: 4px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .warning-box {
+            background-color: #fff3cd;
+            border: 2px solid #856404;
+            padding: 8px;
+            margin: 8px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .checkbox {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 1px solid #000;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .signature-line {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            min-width: 200px;
+            margin: 0 10px;
+        }
+        .small {
+            font-size: 8pt;
+        }
+        .section {
+            margin: 8px 0;
+        }
+        .initial-line {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            width: 60px;
+            margin: 0 5px;
+        }
+        p {
+            margin: 4px 0;
+        }
+        ul {
+            margin: 4px 0;
+            padding-left: 20px;
+        }
+        li {
+            margin: 2px 0;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+
+<h1>OUTDOOR EQUIPMENT RENTAL AGREEMENT</h1>
+<div class="subtitle">The Wild Share - Peer-to-Peer Equipment Rental Platform</div>
+<div class="subtitle">Agreement Date: {{booking_date}}</div>
+
+<h2>1. PARTIES & EQUIPMENT</h2>
+
+<table>
+    <tr>
+        <th style="width: 50%;">EQUIPMENT OWNER</th>
+        <th style="width: 50%;">RENTER</th>
+    </tr>
+    <tr>
+        <td>
+            <strong>Name:</strong> {{owner_name}}<br>
+            <strong>Email:</strong> {{owner_email}}<br>
+            <strong>Phone:</strong> {{owner_phone}}<br>
+            <strong>Address:</strong> {{owner_address}}
+        </td>
+        <td>
+            <strong>Name:</strong> {{renter_name}}<br>
+            <strong>Email:</strong> {{renter_email}}<br>
+            <strong>Phone:</strong> {{renter_phone}}<br>
+            <strong>Address:</strong> {{renter_address}}<br>
+            <strong>Driver's License:</strong> _________________
+        </td>
+    </tr>
+</table>
+
+<p><strong>PLATFORM:</strong> The Wild Share acts as an intermediary connecting Owners and Renters. The Wild Share is not the owner of the equipment and is not a party to the rental transaction itself.</p>
+
+<table style="margin-top: 8px;">
+    <tr>
+        <th>Equipment</th>
+        <td>{{equipment_name}}</td>
+        <th>Category</th>
+        <td>{{equipment_category}}</td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td colspan="3">{{equipment_description}}</td>
+    </tr>
+    <tr>
+        <th>Booking ID</th>
+        <td>{{booking_id}}</td>
+        <th>Rental Period</th>
+        <td>{{start_date}} to {{end_date}} ({{rental_days}} days)</td>
+    </tr>
+</table>
+
+<h2>2. PRICING & PAYMENT</h2>
+
+<table>
+    <tr><td>Daily Rate</td><td>${{daily_price}}</td><td>Subtotal ({{rental_days}} days)</td><td>${{subtotal}}</td></tr>
+    <tr><td>Platform Fee (10%)</td><td>${{platform_fee}}</td><td>Security Deposit (50%)</td><td>${{deposit_amount}}</td></tr>
+    <tr><th>TOTAL CHARGED</th><th>${{total_charged}}</th><th>TOTAL RENTAL COST</th><th>${{total_cost}}</th></tr>
+</table>
+
+<p class="small"><strong>Payment Status:</strong> Paid in full via Stripe on {{payment_date}}. Security deposit will be refunded 2-3 business days after equipment is returned in good condition.</p>
+
+<h2>3. PICKUP & RETURN</h2>
+
+<table>
+    <tr><th>Pickup Location</th><td>{{pickup_location}}</td><th>Pickup Date/Time</th><td>{{pickup_datetime}}</td></tr>
+    <tr><th>Return Location</th><td>{{return_location}}</td><th>Return Date/Time</th><td>{{return_datetime}}</td></tr>
+</table>
+
+<div class="warning-box">
+LATE RETURN PENALTY: 10% of daily rate per hour late (or part thereof). After 4 hours late, a full additional day's rental will be charged.
+</div>
+
+<h2>4. EQUIPMENT CONDITION & INSPECTION</h2>
+
+<p>Both parties must inspect equipment together at pickup and initial each item:</p>
+
+<table>
+    <tr>
+        <th>Condition Check</th>
+        <th style="width: 80px;">Owner Initial</th>
+        <th style="width: 80px;">Renter Initial</th>
+    </tr>
+    <tr><td>Equipment is clean and in good working condition</td><td></td><td></td></tr>
+    <tr><td>No visible damage, cracks, or defects</td><td></td><td></td></tr>
+    <tr><td>All parts and accessories included and functional</td><td></td><td></td></tr>
+    <tr><td>Safety equipment provided (if applicable)</td><td></td><td></td></tr>
+    <tr><td>Operating instructions provided and understood</td><td></td><td></td></tr>
+</table>
+
+<p><strong>Notes on Equipment Condition:</strong> _________________________________________________________________</p>
+
+<h2>5. RENTER RESPONSIBILITIES & ACKNOWLEDGMENTS</h2>
+
+<div class="section">
+<p><span class="checkbox">☐</span> <strong>Owner Initial:</strong> <span class="initial-line"></span> I certify this equipment is in safe working condition and suitable for rental.</p>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span> I have inspected the equipment and agree it is in the condition described above.</p>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span> I agree to return the equipment in the same condition, normal wear and tear excepted.</p>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span> I understand I am responsible for any damage, loss, or theft during the rental period.</p>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span> I understand the cancellation policy: 15+ days = 80% refund, 7-14 days = 50% refund, 6 days or less = 20% refund.</p>
+</div>
+
+<div class="page-break"></div>
+
+<h1>WAIVER AND RELEASE OF LIABILITY</h1>
+<div class="subtitle">Booking ID: {{booking_id}} | Equipment: {{equipment_name}}</div>
+
+<div class="warning-box">
+CAUTION! READ ENTIRE DOCUMENT BEFORE SIGNING. THIS DOCUMENT AFFECTS YOUR LEGAL RIGHTS AND RELEASES ALL LIABILITY AGAINST THE EQUIPMENT OWNER AND THE WILD SHARE PLATFORM.
+</div>
+
+<h2>6. ASSUMPTION OF RISK</h2>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span></p>
+
+<p><strong>I ACKNOWLEDGE</strong> that the operation or use of outdoor equipment has inherent risks that may lead to bodily injury, death, or property damage. I further understand that I am not bound or required to participate in any activities, but I have willingly and voluntarily chosen to rent and use this equipment.</p>
+
+<p><strong>I KNOWINGLY AND VOLUNTARILY ASSUME ALL RISKS</strong> of injury, illness, damage, or loss, both known and unknown, associated with:</p>
+
+<ul>
+    <li>The rental, operation, or use of {{equipment_category}} equipment</li>
+    <li>Outdoor activities and environmental conditions</li>
+    <li>Equipment malfunction or failure</li>
+    <li>My own negligence, act of omission, or lack of skill</li>
+    <li>The negligence of others, including other users of the equipment</li>
+    <li>Weather conditions, terrain, wildlife, and natural hazards</li>
+</ul>
+
+<h2>7. RELEASE AND COVENANT NOT TO SUE</h2>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span></p>
+
+<p><strong>I HEREBY RELEASE AND HOLD HARMLESS</strong> the Equipment Owner ({{owner_name}}) and The Wild Share Platform from all liability, claims, demands, or causes of action for any injury, disability, death, or loss or damage to person or property, whether caused by negligence or otherwise.</p>
+
+<p><strong>THIS INCLUDES</strong> any injury, disability, death, or loss or damage to person or property sustained as a result of any hidden, latent, or obvious defect on the watercraft or any failure to properly instruct, supervise, or train.</p>
+
+<p><strong>I PROMISE NOT TO SUE</strong> or make a claim against the Equipment Owner or The Wild Share Platform for any damages or loss arising from my use of the equipment or related activities.</p>
+
+<h2>8. INDEMNITY TO THIRD PARTIES</h2>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span></p>
+
+<p><strong>I AGREE TO INDEMNIFY AND HOLD HARMLESS</strong> the Equipment Owner and The Wild Share Platform for all personal injuries, property damages, or other damages to any third parties, including but not limited to operators and passengers of other watercraft and minor children under my custody, care, and control, as a result of any and all activities related to the rental, operation, or use of equipment, even if such damages arise out of the negligence or fault of the Equipment Owner or The Wild Share Platform.</p>
+
+<h2>9. DAMAGE, LOSS & THEFT</h2>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span></p>
+
+<p><strong>I am financially responsible</strong> for all costs to repair or replace the equipment if lost, stolen, or damaged during the rental period, including:</p>
+
+<ul>
+    <li>Repair costs calculated at 80% of MSRP for damaged equipment</li>
+    <li>Full replacement value for lost or stolen equipment</li>
+    <li>Loss of rental income to Owner during repair period</li>
+    <li>Any additional costs incurred by Owner (retrieval, transportation, etc.)</li>
+</ul>
+
+<p><strong>I agree to:</strong> Use the equipment in a safe manner; Follow all operating instructions; Not allow unauthorized users; Not use equipment while under the influence of alcohol or drugs; Not use equipment for illegal purposes; Return equipment clean and in the same condition as received.</p>
+
+<h2>10. EQUIPMENT-SPECIFIC SAFETY RULES</h2>
+
+<p><span class="checkbox">☐</span> <strong>Renter Initial:</strong> <span class="initial-line"></span></p>
+
+<p><strong>I certify that I am at least 18 years of age.</strong> I understand that anyone under 18 may not rent equipment unless accompanied by and under the direct supervision of a parent or legal guardian who has signed this agreement.</p>
+
+<p><strong>I agree to comply with all safety rules</strong> specific to the type of equipment rented, including but not limited to:</p>
+
+<ul>
+    <li>Wearing appropriate safety gear (helmets, life jackets, etc.) at all times when required</li>
+    <li>Following all local, state, and federal laws and regulations</li>
+    <li>Operating equipment only in designated areas and within my skill level</li>
+    <li>Not exceeding weight limits, capacity limits, or other manufacturer specifications</li>
+    <li>Inspecting equipment before each use and reporting any issues immediately</li>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>11. GENERAL TERMS & CONDITIONS</h2>
+
+<p><span class="checkbox">☐</span> <strong>Both Parties Initial:</strong> Owner: <span class="initial-line"></span> Renter: <span class="initial-line"></span></p>
+
+<p><strong>Cancellation Policy:</strong> If Renter cancels, the following refunds apply: 15+ days before rental = 80% refund; 7-14 days = 50% refund; 2-6 days = 20% refund; 0-1 days = no refund. Platform fee is non-refundable.</p>
+
+<p><strong>Insurance:</strong> Owner is not providing any insurance coverage. Renter is financially responsible for all loss, damage, or injury. Renter should check their own insurance policies for coverage.</p>
+
+<p><strong>Modifications:</strong> Renter may not modify, alter, or make any changes to the equipment without written permission from Owner.</p>
+
+<p><strong>Dispute Resolution:</strong> Any disputes shall be resolved through mediation or arbitration before pursuing litigation. This agreement is governed by the laws of the state where the equipment is located.</p>
+
+<p><strong>Privacy:</strong> Personal data collected will be used only for this rental transaction and will not be shared with third parties except as required by law. See The Wild Share Privacy Policy for details.</p>
+
+<p><strong>Severability:</strong> If any provision of this agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
+
+<p><strong>Entire Agreement:</strong> This agreement constitutes the entire agreement between the parties and supersedes all prior discussions, representations, or agreements. No modification is valid unless in writing and signed by both parties.</p>
+
+<h2>12. ACKNOWLEDGMENT & SIGNATURES</h2>
+
+<div class="warning-box">
+I HAVE CAREFULLY READ, UNDERSTOOD, AND AGREED TO ALL TERMS OF THIS RENTAL AGREEMENT AND WAIVER OF LIABILITY. I AM AWARE THAT I AM GIVING UP SUBSTANTIAL RIGHTS IN CONSIDERATION FOR MY USE OF THE EQUIPMENT. I ENTER INTO THIS AGREEMENT FREELY AND VOLUNTARILY WITHOUT ANY INDUCEMENT.
+</div>
+
+<table style="margin-top: 15px;">
+    <tr>
+        <th style="width: 50%;">EQUIPMENT OWNER</th>
+        <th style="width: 50%;">RENTER</th>
+    </tr>
+    <tr>
+        <td style="height: 60px; vertical-align: bottom;">
+            <strong>Signature:</strong> _________________________________
+        </td>
+        <td style="height: 60px; vertical-align: bottom;">
+            <strong>Signature:</strong> _________________________________
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <strong>Print Name:</strong> {{owner_name}}<br>
+            <strong>Date:</strong> _______________________
+        </td>
+        <td>
+            <strong>Print Name:</strong> {{renter_name}}<br>
+            <strong>Date:</strong> _______________________
+        </td>
+    </tr>
+</table>
+
+<p class="small" style="margin-top: 15px; text-align: center;">
+<strong>For Platform Use Only:</strong> Booking ID: {{booking_id}} | Agreement generated via The Wild Share platform | Payment processed via Stripe
+</p>
+
+</body>
+</html>
+
