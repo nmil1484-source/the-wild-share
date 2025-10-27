@@ -12,6 +12,7 @@ import './App.css'
 import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI, reviewsAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
 import AdminDashboard from './components/AdminDashboard'
+import { TermsOfServiceView, PrivacyPolicyView } from './legal_views'
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -825,8 +826,8 @@ function App() {
                         <input type="checkbox" id="terms" checked={authForm.terms_agreed} onChange={(e) => setAuthForm({ ...authForm, terms_agreed: e.target.checked })} />
                         <Label htmlFor="terms" className="text-sm font-normal text-muted-foreground">
                           I agree to the{" "}
-                          <a href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="underline">Terms of Service</a> and{" "}
-                          <a href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline">Privacy Policy</a>.
+                          <button type="button" onClick={() => { setShowAuthDialog(false); setCurrentView('terms-of-service'); }} className="underline hover:text-emerald-600">Terms of Service</button> and{" "}
+                          <button type="button" onClick={() => { setShowAuthDialog(false); setCurrentView('privacy-policy'); }} className="underline hover:text-emerald-600">Privacy Policy</button>.
                         </Label>
                       </div>
                     )}
@@ -1091,14 +1092,15 @@ function App() {
               </Card>
             )}
 
-            {/* Create Equipment Form */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>List New Equipment</CardTitle>
-                <CardDescription>Add equipment to rent out to others</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleCreateEquipment} className="space-y-4">
+            {/* Create Equipment Form - Only show if Stripe is connected */}
+            {user.stripe_onboarding_complete ? (
+              <Card className="mb-8">
+                <CardHeader>
+                  <CardTitle>List New Equipment</CardTitle>
+                  <CardDescription>Add equipment to rent out to others</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleCreateEquipment} className="space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="name">Equipment Name</Label>
@@ -1229,6 +1231,48 @@ function App() {
                 </form>
               </CardContent>
             </Card>
+            ) : (
+              <Card className="mb-8 border-amber-500 bg-amber-50">
+                <CardContent className="pt-6">
+                  <div className="text-center py-8">
+                    <Shield className="h-16 w-16 text-amber-600 mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold mb-2">Connect Stripe to List Equipment</h3>
+                    <p className="text-slate-600 mb-6 max-w-lg mx-auto">
+                      To protect both renters and owners, you must connect your Stripe account before listing equipment. 
+                      This secure process takes just a few minutes and allows you to receive payments directly to your bank account.
+                    </p>
+                    <div className="bg-white p-6 rounded-lg border border-amber-200 max-w-md mx-auto mb-6">
+                      <h4 className="font-semibold mb-3">Benefits of Stripe Connect:</h4>
+                      <ul className="text-left space-y-2 text-sm text-slate-600">
+                        <li className="flex items-center gap-2">
+                          <span className="text-emerald-600">✓</span>
+                          Secure payment processing
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <span className="text-emerald-600">✓</span>
+                          Automatic payouts to your bank
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <span className="text-emerald-600">✓</span>
+                          Fraud protection
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <span className="text-emerald-600">✓</span>
+                          Professional rental contracts
+                        </li>
+                      </ul>
+                    </div>
+                    <Button 
+                      onClick={() => window.location.href = '/api/payments/connect/onboard'}
+                      className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 text-lg"
+                      size="lg"
+                    >
+                      Connect Stripe Account Now
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             {/* My Equipment List */}
             <div className="space-y-4">
@@ -2417,6 +2461,14 @@ function App() {
             </div>
           </div>
         )}
+
+        {currentView === 'terms-of-service' && (
+          <TermsOfServiceView setCurrentView={setCurrentView} />
+        )}
+
+        {currentView === 'privacy-policy' && (
+          <PrivacyPolicyView setCurrentView={setCurrentView} />
+        )}
       </div>
 
       {/* Footer */}
@@ -2448,8 +2500,8 @@ function App() {
                 <li><button onClick={() => setCurrentView('contact')} className="hover:text-white transition-colors">Contact</button></li>
                 <li><button onClick={() => setCurrentView('terms')} className="hover:text-white transition-colors">Rental Terms</button></li>
                 <li><button onClick={() => setCurrentView('faq')} className="hover:text-white transition-colors">FAQ</button></li>
-                <li><a href="/legal/terms-of-service" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Terms of Service</a></li>
-                <li><a href="/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><button onClick={() => setCurrentView('terms-of-service')} className="hover:text-white transition-colors">Terms of Service</button></li>
+                <li><button onClick={() => setCurrentView('privacy-policy')} className="hover:text-white transition-colors">Privacy Policy</button></li>
               </ul>
             </div>
             <div>

@@ -66,6 +66,7 @@ class User(db.Model):
             'is_credit_checked': self.is_credit_checked,
             'stripe_account_id': self.stripe_account_id,
             'stripe_onboarding_complete': self.stripe_onboarding_complete,
+            'is_admin': self.is_admin if hasattr(self, 'is_admin') else False,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
