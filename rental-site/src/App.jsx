@@ -882,6 +882,98 @@ function App() {
                 </Card>
               ))}
             </div>
+
+            {/* Contract Protection Banner */}
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-lg p-8 mb-16">
+              <div className="flex items-start gap-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-emerald-600 rounded-full flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold text-emerald-900 mb-2">Protected by Legal Rental Contracts</h3>
+                  <p className="text-emerald-800 mb-4">
+                    Every rental on The Wild Share is protected by a comprehensive 3-page legal contract that safeguards both renters and owners. 
+                    Our contracts include clear terms for equipment condition, security deposits, liability, insurance requirements, and dispute resolution.
+                  </p>
+                  <div className="grid md:grid-cols-3 gap-4 text-sm">
+                    <div className="flex items-start gap-2">
+                      <FileText className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-emerald-900">Automatic Contract Generation</p>
+                        <p className="text-emerald-700">Every booking creates a legally binding contract</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Shield className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-emerald-900">Security Deposits</p>
+                        <p className="text-emerald-700">50% deposit held to protect equipment</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Download className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-emerald-900">Download Anytime</p>
+                        <p className="text-emerald-700">Access your contracts from your bookings</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Featured Equipment Section */}
+            {equipment && equipment.length > 0 && (
+              <div className="mb-16">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-3xl font-bold">Available Equipment</h2>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setCurrentView('browse')}
+                    className="text-emerald-600 border-emerald-600 hover:bg-emerald-50"
+                  >
+                    View All
+                    <ChevronRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="grid md:grid-cols-3 gap-6">
+                  {equipment.slice(0, 6).map((item) => {
+                    const images = item.image_urls && item.image_urls.length > 0 ? item.image_urls : (item.image_url ? [item.image_url] : [])
+                    return (
+                      <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => { setCurrentView('browse'); }}>
+                        <div className="aspect-video bg-slate-200 relative">
+                          {images.length > 0 ? (
+                            <img src={images[0]} alt={item.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <Mountain className="h-16 w-16 text-slate-400" />
+                            </div>
+                          )}
+                          <Badge className="absolute top-2 right-2 bg-emerald-600">
+                            {categories.find(c => c.id === item.category)?.name}
+                          </Badge>
+                        </div>
+                        <CardHeader>
+                          <CardTitle className="text-lg">{item.name}</CardTitle>
+                          <CardDescription className="line-clamp-2">{item.description}</CardDescription>
+                          {item.location && (
+                            <p className="text-sm text-muted-foreground mt-2">📍 {item.location}</p>
+                          )}
+                        </CardHeader>
+                        <CardFooter className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-emerald-600">${item.daily_price}/day</span>
+                          <Button size="sm" className="bg-emerald-600 hover:bg-emerald-700">
+                            View Details
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
           </>
         )}
 
