@@ -1,12 +1,11 @@
 from flask import Blueprint, jsonify, request
-from flask_login import login_required, current_user
-from ..models.user import User
-from ..models.equipment import Equipment
-from ..models.booking import Booking
-from ..models.message import Message
-from ..models.review import Review
-from ..models.identity_verification import IdentityVerification
-from ..models.booking import db
+import os
+from src.models.user import db, User
+from src.models.equipment import Equipment
+from src.models.booking import Booking
+from src.models.message import Message
+from src.models.review import Review
+from src.models.identity_verification import IdentityVerification
 
 admin_bp = Blueprint('admin', __name__)
 
