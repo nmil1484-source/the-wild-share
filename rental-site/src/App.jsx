@@ -677,7 +677,9 @@ function App() {
     })
 
   // If admin view, show admin dashboard only
+  console.log('Current view:', currentView, 'User:', user, 'Is admin:', user?.is_admin);
   if (currentView === 'admin' && user && user.is_admin) {
+    console.log('Rendering AdminDashboard');
     return <AdminDashboard user={user} onLogout={handleLogout} />
   }
 
@@ -721,7 +723,7 @@ function App() {
                   <span>{user.first_name}</span>
                 </button>
                 {user.is_admin && (
-                  <Button variant="outline" className="text-white border-white hover:bg-white/20" onClick={() => setCurrentView('admin')}>
+                  <Button variant="outline" className="text-white border-white hover:bg-white/20" onClick={() => { console.log('Admin button clicked, setting view to admin'); setCurrentView('admin'); }}>
                     <Shield className="h-4 w-4 mr-2" />
                     Admin
                   </Button>
