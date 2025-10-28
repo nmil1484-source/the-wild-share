@@ -1,10 +1,10 @@
 [phases.setup]
-nixPkgs = ["python310", "nodejs_18", "nodePackages.pnpm"]
+nixPkgs = ["python310", "nodejs_18"]
 
 [phases.build]
 cmds = [
-    "cd rental-site && pnpm install",
-    "cd rental-site && VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY pnpm run build",
+    "cd rental-site && npm install",
+    "cd rental-site && VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY npm run build",
     "mkdir -p backend/src/static",
     "rm -rf backend/src/static/*",
     "cp -r rental-site/dist/* backend/src/static/"
@@ -13,4 +13,3 @@ cmds = [
 [start]
 cmd = "cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --log-level debug --access-logfile - --error-logfile - wsgi:app"
 
-# Force rebuild Mon Oct 27 12:03:14 EDT 2025
