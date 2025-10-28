@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.railpack.com",
+  "provider": "python",
+  "packages": {
+    "node": "18",
+    "python": "3.10"
+  },
+  "steps": {
+    "install": {
+      "commands": [
+        "pip install -r requirements.txt",
+        "npm install -g pnpm",
+        "cd rental-site && pnpm install"
+      ]
+    },
+    "build": {
+      "inputs": [{ "step": "install" }],
+      "commands": [
+        "cd rental-site && VITE_STRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY pnpm run build",
+        "mkdir -p backend/src/static",
+        "rm -rf backend/src/static/*",
+        "cp -r rental-site/dist/* backend/src/static/"
+      ]
+    }
+  },
+  "deploy": {
+    "startCommand": "cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --log-level debug --access-logfile - --error-logfile - wsgi:app",
+    "inputs": [
+      {
+        "step": "build",
+        "include": ["."]
+      }
+    ]
+  }
+}
+
