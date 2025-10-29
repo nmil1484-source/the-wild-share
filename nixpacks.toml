@@ -11,5 +11,6 @@ cmds = [
 ]
 
 [start]
+# Force rebuild - updated 2025-10-29
 cmd = "cd backend && gunicorn --bind 0.0.0.0:$PORT --workers 2 --timeout 120 --log-level debug --access-logfile - --error-logfile - wsgi:app"
 
