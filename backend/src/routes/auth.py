@@ -61,10 +61,16 @@ def login():
     # Create access token with string identity
     access_token = create_access_token(identity=str(user.id))
     
+    # Debug logging
+    user_dict = user.to_dict()
+    print(f"DEBUG LOGIN: User {user.email} - is_admin in dict: {user_dict.get('is_admin')}")
+    print(f"DEBUG LOGIN: User object is_admin: {user.is_admin}")
+    print(f"DEBUG LOGIN: Full user dict: {user_dict}")
+    
     return jsonify({
         'message': 'Login successful',
         'access_token': access_token,
-        'user': user.to_dict()
+        'user': user_dict
     }), 200
 
 @auth_bp.route('/me', methods=['GET'])
