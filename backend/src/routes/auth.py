@@ -82,7 +82,13 @@ def get_current_user():
     if not user:
         return jsonify({'error': 'User not found'}), 404
     
-    return jsonify(user.to_dict()), 200
+    # Debug: Force check is_admin attribute
+    user_dict = user.to_dict()
+    print(f"DEBUG /me: User {user.email} - is_admin in dict: {user_dict.get('is_admin')}")
+    print(f"DEBUG /me: User object is_admin attr: {user.is_admin}")
+    print(f"DEBUG /me: Dict keys: {list(user_dict.keys())}")
+    
+    return jsonify(user_dict), 200
 
 @auth_bp.route('/profile', methods=['PUT'])
 @jwt_required()
