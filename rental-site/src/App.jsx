@@ -1205,7 +1205,10 @@ function App() {
                         This secure process takes just a few minutes and allows you to receive 90% of each rental payment directly to your bank account.
                       </p>
                       <Button 
-                        onClick={() => window.location.href = '/api/payments/connect/onboard'}
+                        onClick={() => {
+                          const token = localStorage.getItem('token');
+                          window.location.href = `/api/stripe/onboard?token=${token}`;
+                        }}
                         className="bg-emerald-600 hover:bg-emerald-700"
                       >
                         Connect Stripe Account
@@ -1387,7 +1390,10 @@ function App() {
                       </ul>
                     </div>
                     <Button 
-                      onClick={() => window.location.href = '/api/payments/connect/onboard'}
+                      onClick={() => {
+                        const token = localStorage.getItem('token');
+                        window.location.href = `/api/stripe/onboard?token=${token}`;
+                      }}
                       className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 text-lg"
                       size="lg"
                     >

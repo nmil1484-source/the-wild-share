@@ -143,6 +143,72 @@ def check_onboarding_status():
             'message': str(e)
         }), 500
 
+@stripe_connect_bp.route('/onboard', methods=['GET'])
+def onboard():
+    """One-step onboarding: creates account if needed and redirects to Stripe onboarding"""
+    from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
+    from flask import request as flask_request
+    
+    # Get token from query parameter
+    token = flask_request.args.get('token')
+    if not token:
+        return jsonify({'error': 'Authentication token required'}), 401
+    
+    # Manually verify JWT
+    try:
+        from flask_jwt_extended import decode_token
+        decoded = decode_token(token)
+        user_id = int(decoded['sub'])
+    except Exception as e:
+        return jsonify({'error': 'Invalid token', 'message': str(e)}), 401
+    
+    user = User.query.get(user_id)
+    
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    
+    # Check if user is an owner
+    if user.user_type not in ['owner', 'both']:
+        return jsonify({'error': 'Only equipment owners can connect Stripe'}), 403
+    
+    try:
+        # Create Stripe account if doesn't exist
+        if not user.stripe_account_id:
+            account = stripe.Account.create(
+                type='express',
+                country='US',
+                email=user.email,
+                capabilities={
+                    'card_payments': {'requested': True},
+                    'transfers': {'requested': True},
+                },
+                business_type='individual',
+                business_profile={
+                    'name': f"{user.first_name} {user.last_name}",
+                    'product_description': 'Outdoor equipment rental',
+                }
+            )
+            user.stripe_account_id = account.id
+            db.session.commit()
+        
+        # Create onboarding link
+        account_link = stripe.AccountLink.create(
+            account=user.stripe_account_id,
+            refresh_url='https://thewildshare.com/dashboard',
+            return_url='https://thewildshare.com/dashboard',
+            type='account_onboarding',
+        )
+        
+        # Redirect to Stripe onboarding
+        from flask import redirect
+        return redirect(account_link.url)
+        
+    except stripe.error.StripeError as e:
+        return jsonify({
+            'error': 'Failed to start onboarding',
+            'message': str(e)
+        }), 500
+
 @stripe_connect_bp.route('/dashboard-link', methods=['POST'])
 @jwt_required()
 def create_dashboard_link():
