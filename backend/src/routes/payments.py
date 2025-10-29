@@ -51,24 +51,22 @@ def create_payment_intent():
     owner_payout = booking.total_cost - platform_fee
     
     try:
-        # Create Stripe payment intent with destination charge (Stripe Connect)
-        # This charges the customer and automatically splits the payment
+        # Create Stripe payment intent - hold ALL money on platform account
+        # Will transfer to owner AFTER equipment is returned and confirmed
         intent = stripe.PaymentIntent.create(
-            amount=int(total_amount * 100),  # Stripe uses cents
+            amount=int(total_amount * 100),  # Stripe uses cents (rental + deposit)
             currency='usd',
-            application_fee_amount=int(platform_fee * 100),  # Platform commission
-            transfer_data={
-                'destination': owner.stripe_account_id,  # Owner's Connect account
-            },
             metadata={
                 'booking_id': booking_id,
                 'renter_id': user_id,
                 'owner_id': owner.id,
+                'owner_stripe_account': owner.stripe_account_id,
                 'rental_cost': booking.total_cost,
                 'deposit_amount': booking.deposit_amount,
                 'platform_fee': platform_fee,
                 'owner_payout': owner_payout
-            }
+            },
+            description=f'Booking #{booking_id} - Rental + Deposit'
         )
         
         # Create payment records
@@ -154,7 +152,7 @@ def confirm_payment():
     
     return jsonify({
         'message': 'Payment confirmed successfully',
-        'note': 'Owner will receive their payout (90% of rental cost) automatically to their bank account',
+        'note': 'Payment received! Owner will receive their payout (90% of rental cost) after you return the equipment and they confirm its condition.',
         'booking': booking.to_dict() if booking else None
     }), 200
 
@@ -233,6 +231,38 @@ def confirm_return():
         # Update deposit payment status
         deposit_payment.status = 'refunded' if refund_amount == deposit_payment.amount else 'partially_refunded'
         
+        # NOW transfer rental payout to owner (90% of rental cost + any damage charges)
+        equipment = Equipment.query.get(booking.equipment_id)
+        owner = User.query.get(equipment.owner_id)
+        
+        platform_fee = booking.total_cost * PLATFORM_COMMISSION_RATE
+        owner_rental_payout = booking.total_cost - platform_fee  # 90% of rental
+        total_owner_payout = owner_rental_payout + damage_cost  # Add damage charges if any
+        
+        # Transfer to owner's Stripe Connect account
+        transfer = stripe.Transfer.create(
+            amount=int(total_owner_payout * 100),
+            currency='usd',
+            destination=owner.stripe_account_id,
+            metadata={
+                'booking_id': booking_id,
+                'rental_payout': owner_rental_payout,
+                'damage_charge': damage_cost,
+                'platform_fee': platform_fee
+            },
+            description=f'Payout for Booking #{booking_id}'
+        )
+        
+        # Create payout payment record
+        payout_payment = Payment(
+            booking_id=booking_id,
+            payment_type='owner_payout',
+            amount=total_owner_payout,
+            stripe_payment_id=transfer.id,
+            status='completed'
+        )
+        db.session.add(payout_payment)
+        
         # Update booking status to completed
         booking.status = 'completed'
         
@@ -242,8 +272,16 @@ def confirm_return():
             'message': 'Equipment return confirmed successfully',
             'deposit_refunded': refund_amount,
             'damage_charge': damage_cost if equipment_condition == 'damaged' else 0,
+            'owner_payout': total_owner_payout,
             'equipment_condition': equipment_condition,
-            'note': 'Deposit has been automatically refunded to the renter'
+            'breakdown': {
+                'rental_payout_90_percent': owner_rental_payout,
+                'damage_reimbursement': damage_cost,
+                'total_transferred_to_owner': total_owner_payout,
+                'platform_commission_10_percent': platform_fee,
+                'deposit_refunded_to_renter': refund_amount
+            },
+            'note': 'Deposit refunded to renter. Your payout has been transferred to your bank account (arrives in 2-7 business days)'
         }), 200
         
     except stripe.error.StripeError as e:
@@ -321,6 +359,6 @@ def get_my_earnings():
         'platform_fees_10_percent': round(platform_fees, 2),
         'net_earnings_90_percent': round(net_earnings, 2),
         'stripe_account_connected': user.stripe_onboarding_complete,
-        'note': 'Earnings are automatically transferred to your bank account within 2-7 business days'
+        'note': 'Earnings are transferred to your bank account after you confirm equipment return (arrives in 2-7 business days)'
     }), 200
 
