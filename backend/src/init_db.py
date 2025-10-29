@@ -9,11 +9,11 @@ import sys
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.app import app, db
-from src.models.user import User
-from src.models.equipment import Equipment
-from src.models.booking import Booking
-from src.models.message import Message
+from main import app, db
+from models.user import User
+from models.equipment import Equipment
+from models.booking import Booking
+from models.message import Message
 
 def init_database():
     """Initialize database with tables and admin user"""
