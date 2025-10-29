@@ -130,6 +130,18 @@ function App() {
   // Load user and equipment on mount
   useEffect(() => {
     const token = localStorage.getItem('access_token')
+    const savedUser = localStorage.getItem('user')
+    
+    // Load user from localStorage first for immediate display
+    if (savedUser) {
+      try {
+        setUser(JSON.parse(savedUser))
+      } catch (e) {
+        console.error('Failed to parse saved user:', e)
+      }
+    }
+    
+    // Then refresh from API if we have a token
     if (token) {
       loadUser()
     }
@@ -173,6 +185,7 @@ function App() {
   const loadUser = async () => {
     try {
       const response = await authAPI.getProfile()
+      localStorage.setItem('user', JSON.stringify(response.data))
       setUser(response.data)
       if (response.data.user_type === 'owner' || response.data.user_type === 'both') {
         loadMyEquipment()
@@ -326,6 +339,7 @@ function App() {
           : await authAPI.register(authForm)
         
         localStorage.setItem('access_token', response.data.access_token)
+        localStorage.setItem('user', JSON.stringify(response.data.user))
         setUser(response.data.user)
         setShowAuthDialog(false)
         setAuthForm({ email: '', password: '', first_name: '', last_name: '', phone: '', user_type: 'both' })
@@ -358,6 +372,7 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem('access_token')
+    localStorage.removeItem('user')
     setUser(null)
     setMyEquipment([])
     setMyBookings([])
