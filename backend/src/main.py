@@ -36,6 +36,7 @@ from src.routes.dashboard import dashboard_bp
 from src.routes.sample_contract import sample_contract_bp
 from src.routes.admin import admin_bp
 from src.routes.admin_moderation import admin_mod_bp
+from src.routes.subscription import subscription_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
@@ -92,6 +93,13 @@ with app.app_context():
                 print("Added location column to equipment table")
     except Exception as e:
         print(f"Migration note: {e}")
+    
+    # Run automatic migrations
+    try:
+        from src.migrations import run_migrations
+        run_migrations(app)
+    except Exception as e:
+        print(f"Migration runner note: {e}")
 
 # Register API blueprints FIRST (so they take priority)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -115,6 +123,7 @@ app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(sample_contract_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
 app.register_blueprint(admin_mod_bp, url_prefix='/api')
+app.register_blueprint(subscription_bp, url_prefix='/api/subscription')
 
 # Serve static assets (CSS, JS, images)
 @app.route('/assets/<path:path>')

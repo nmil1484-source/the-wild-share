@@ -36,6 +36,15 @@ class User(db.Model):
     stripe_account_id = db.Column(db.String(255))  # Stripe Connect account ID
     stripe_onboarding_complete = db.Column(db.Boolean, default=False)
     
+    # Subscription and monetization fields
+    subscription_tier = db.Column(db.String(20), default='free')  # free, pro, business
+    stripe_customer_id = db.Column(db.String(255))  # Stripe Customer ID for subscriptions
+    stripe_subscription_id = db.Column(db.String(255))  # Stripe Subscription ID
+    subscription_status = db.Column(db.String(20), default='inactive')  # active, canceled, past_due, trialing
+    subscription_start_date = db.Column(db.DateTime)
+    subscription_end_date = db.Column(db.DateTime)
+    trial_ends_at = db.Column(db.DateTime)  # For free trials
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -67,6 +76,11 @@ class User(db.Model):
             'stripe_account_id': self.stripe_account_id,
             'stripe_onboarding_complete': self.stripe_onboarding_complete,
             'is_admin': self.is_admin,
+            'subscription_tier': self.subscription_tier,
+            'subscription_status': self.subscription_status,
+            'subscription_start_date': self.subscription_start_date.isoformat() if self.subscription_start_date else None,
+            'subscription_end_date': self.subscription_end_date.isoformat() if self.subscription_end_date else None,
+            'trial_ends_at': self.trial_ends_at.isoformat() if self.trial_ends_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 

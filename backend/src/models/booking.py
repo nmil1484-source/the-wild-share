@@ -10,7 +10,9 @@ class Booking(db.Model):
     total_days = db.Column(db.Integer, nullable=False)
     daily_rate = db.Column(db.Float, nullable=False)
     total_cost = db.Column(db.Float, nullable=False)
-    deposit_amount = db.Column(db.Float, nullable=False)  # 50% of total_cost
+    deposit_amount = db.Column(db.Float, nullable=False)  # Amount paid upfront
+    deposit_percentage = db.Column(db.Integer, default=50)  # 50% or 100%
+    remaining_amount = db.Column(db.Float, default=0)  # Amount due at pickup/return
     status = db.Column(db.String(20), default='pending')  # pending, confirmed, active, completed, cancelled
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -32,6 +34,8 @@ class Booking(db.Model):
             'daily_rate': self.daily_rate,
             'total_cost': self.total_cost,
             'deposit_amount': self.deposit_amount,
+            'deposit_percentage': self.deposit_percentage,
+            'remaining_amount': self.remaining_amount,
             'status': self.status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'equipment': self.equipment.to_dict() if self.equipment else None,
