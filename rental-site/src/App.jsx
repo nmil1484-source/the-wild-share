@@ -12,6 +12,7 @@ import './App.css'
 import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI, reviewsAPI } from './lib/api'
 import StripeCheckout from './components/StripeCheckout'
 import AdminDashboard from './components/AdminDashboard'
+import PricingPage from './components/PricingPage'
 import { TermsOfServiceView, PrivacyPolicyView } from './legal_views'
 
 function App() {
@@ -712,6 +713,9 @@ function App() {
               <>
                 <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setCurrentView('browse')}>
                   Browse
+                </Button>
+                <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setCurrentView('pricing')}>
+                  Pricing
                 </Button>
                 <Button variant="ghost" className="text-white hover:bg-white/20" onClick={() => setCurrentView('bookings')}>
                   My Bookings
@@ -2605,6 +2609,17 @@ function App() {
               </div>
             </div>
           </div>
+        )}
+
+        {currentView === 'pricing' && (
+          <PricingPage 
+            user={user} 
+            onUpgrade={(tier) => {
+              // TODO: Implement Stripe checkout
+              alert(`Upgrading to ${tier}! Stripe integration coming soon.`)
+            }}
+            onViewChange={setCurrentView}
+          />
         )}
 
         {currentView === 'terms-of-service' && (
