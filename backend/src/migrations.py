@@ -97,11 +97,20 @@ def run_migrations(app):
                 # Migration 3: Increase capacity_spec column size
                 logger.info("Running migration: Increase capacity_spec column size")
                 try:
-                    conn.execute(text("ALTER TABLE equipment ALTER COLUMN capacity_spec TYPE VARCHAR(500)"))
-                    conn.commit()
-                    logger.info("✅ Increased capacity_spec column size to 500")
+                    # Use a separate transaction for this migration
+                    trans = conn.begin()
+                    try:
+                        conn.execute(text("ALTER TABLE equipment ALTER COLUMN capacity_spec TYPE VARCHAR(500)"))
+                        trans.commit()
+                        logger.info("✅ Increased capacity_spec column size to 500")
+                    except Exception as inner_e:
+                        trans.rollback()
+                        raise inner_e
                 except Exception as e:
                     logger.warning(f"⚠️  Could not increase capacity_spec size: {e}")
+                    # Print full error for debugging
+                    import traceback
+                    logger.error(traceback.format_exc())
                 
                 # Migration 4: Add boost fields to equipment table
                 logger.info("Running migration: Add boost fields to equipment table")
