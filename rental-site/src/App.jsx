@@ -967,7 +967,7 @@ function App() {
                       <Shield className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-emerald-900">Security Deposits</p>
-                        <p className="text-emerald-700">50% deposit held to protect equipment</p>
+                        <p className="text-emerald-700">Owner-set refundable deposits protect equipment</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
@@ -2292,7 +2292,7 @@ function App() {
                 <CardContent className="space-y-3">
                   <div>
                     <h4 className="font-semibold">Deposit Amount</h4>
-                    <p className="text-muted-foreground">A security deposit of 50% of the total rental cost is required at the time of booking.</p>
+                    <p className="text-muted-foreground">Equipment owners may require a refundable security deposit at the time of booking. The deposit amount is set by the owner and shown on the equipment listing.</p>
                   </div>
                   <div>
                     <h4 className="font-semibold">Refund Policy</h4>
@@ -2449,7 +2449,7 @@ function App() {
                     <li>Click "Book Now" on the equipment you want</li>
                     <li>Review and accept the rental agreement</li>
                     <li>Enter your rental dates</li>
-                    <li>Complete payment (rental cost + 50% security deposit)</li>
+                    <li>Complete payment (rental cost + owner's security deposit if required)</li>
                     <li>Coordinate pickup with the owner</li>
                     <li>Enjoy your adventure!</li>
                     <li>Return equipment on time in good condition</li>
@@ -2481,7 +2481,7 @@ function App() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <p className="text-muted-foreground">
-                    A security deposit of 50% of the total rental cost is required when booking equipment. This protects equipment owners against damage or loss.
+                    Equipment owners may require a refundable security deposit when booking their equipment. The deposit amount is set by each owner and displayed on their listing. This protects owners against damage or loss.
                   </p>
                   <p className="text-muted-foreground">
                     The deposit is fully refunded when you return the equipment in good condition (normal wear and tear is expected). Refunds are typically processed within 2-3 business days after equipment return and inspection.
@@ -2520,7 +2520,7 @@ function App() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    All payments are processed securely through Stripe. When you book equipment, you pay the rental cost plus a 50% security deposit. The rental payment goes to the equipment owner, and the deposit is held until the equipment is returned in good condition.
+                    All payments are processed securely through Stripe. When you book equipment, you pay the rental cost plus any security deposit required by the owner. The rental payment goes to the equipment owner, and the deposit (if required) is held until the equipment is returned in good condition.
                   </p>
                 </CardContent>
               </Card>
