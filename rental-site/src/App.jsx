@@ -1211,35 +1211,31 @@ function App() {
               <h2 className="text-3xl font-bold">My Equipment</h2>
             </div>
 
-            {/* Stripe Connect Banner */}
-            {user && !user.stripe_account_id && (
-              <Card className="mb-8 border-emerald-500 bg-emerald-50">
-                <CardContent className="pt-6">
-                  <div className="flex items-start gap-4">
-                    <AlertTriangle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-1" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg mb-2">Connect Stripe to Accept Payments</h3>
-                      <p className="text-sm text-slate-600 mb-4">
-                        To receive payments for your equipment rentals, you need to connect your bank account through Stripe. 
-                        This secure process takes just a few minutes and allows you to receive 90% of each rental payment directly to your bank account.
-                      </p>
-                      <Button 
-                        onClick={() => {
-                          const token = localStorage.getItem('token');
-                          window.location.href = `/api/stripe/onboard?token=${token}`;
-                        }}
-                        className="bg-emerald-600 hover:bg-emerald-700"
-                      >
-                        Connect Stripe Account
-                      </Button>
-                    </div>
+            {/* Info Banner - No Stripe Connect Required */}
+            <Card className="mb-8 border-blue-500 bg-blue-50">
+              <CardContent className="pt-6">
+                <div className="flex items-start gap-4">
+                  <Zap className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg mb-2">List for Free, Boost When You Want</h3>
+                    <p className="text-sm text-slate-600 mb-2">
+                      Create unlimited listings at no cost. No transaction fees, no subscriptions. 
+                      Want more visibility? Boost your listing to the top for just $2.99!
+                    </p>
+                    <Button 
+                      onClick={() => setCurrentView('pricing')}
+                      variant="outline"
+                      className="border-blue-600 text-blue-600 hover:bg-blue-100"
+                    >
+                      View Boost Options
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              </CardContent>
+            </Card>
 
-            {/* Create Equipment Form - Only show if Stripe is connected */}
-            {user.stripe_onboarding_complete ? (
+            {/* Create Equipment Form - Always show (no Stripe required) */}
+            {true ? (
               <Card className="mb-8">
                 <CardHeader>
                   <CardTitle>List New Equipment</CardTitle>
@@ -1377,51 +1373,7 @@ function App() {
                 </form>
               </CardContent>
             </Card>
-            ) : (
-              <Card className="mb-8 border-amber-500 bg-amber-50">
-                <CardContent className="pt-6">
-                  <div className="text-center py-8">
-                    <Shield className="h-16 w-16 text-amber-600 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold mb-2">Connect Stripe to List Equipment</h3>
-                    <p className="text-slate-600 mb-6 max-w-lg mx-auto">
-                      To protect both renters and owners, you must connect your Stripe account before listing equipment. 
-                      This secure process takes just a few minutes and allows you to receive payments directly to your bank account.
-                    </p>
-                    <div className="bg-white p-6 rounded-lg border border-amber-200 max-w-md mx-auto mb-6">
-                      <h4 className="font-semibold mb-3">Benefits of Stripe Connect:</h4>
-                      <ul className="text-left space-y-2 text-sm text-slate-600">
-                        <li className="flex items-center gap-2">
-                          <span className="text-emerald-600">✓</span>
-                          Secure payment processing
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-emerald-600">✓</span>
-                          Automatic payouts to your bank
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-emerald-600">✓</span>
-                          Fraud protection
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <span className="text-emerald-600">✓</span>
-                          Professional rental contracts
-                        </li>
-                      </ul>
-                    </div>
-                    <Button 
-                      onClick={() => {
-                        const token = localStorage.getItem('token');
-                        window.location.href = `/api/stripe/onboard?token=${token}`;
-                      }}
-                      className="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3 text-lg"
-                      size="lg"
-                    >
-                      Connect Stripe Account Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+            ) : null}
 
             {/* My Equipment List */}
             <div className="space-y-4">
