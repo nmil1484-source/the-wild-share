@@ -212,13 +212,8 @@ def create_equipment():
     if user.user_type not in ['owner', 'both']:
         return jsonify({'error': 'Only equipment owners can create listings'}), 403
     
-    # Check if user has completed Stripe Connect onboarding
-    if not user.stripe_account_id or not user.stripe_onboarding_complete:
-        return jsonify({
-            'error': 'Stripe Connect required',
-            'message': 'You must complete Stripe Connect setup before listing equipment',
-            'requires_stripe': True
-        }), 403
+    # No Stripe Connect required anymore - pay-per-boost model!
+    # Users can list for free, only pay to boost listings
     
     data = request.get_json()
     
