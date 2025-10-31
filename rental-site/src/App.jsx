@@ -522,24 +522,59 @@ function App() {
       location: item.location,
       security_deposit: item.security_deposit || ''
     })
+    // Reset image states when opening edit modal
+    setEquipmentImages([])
+    setImagePreviewUrls([])
     setShowEditDialog(true)
   }
 
   const handleUpdateEquipment = async (e) => {
     e.preventDefault()
     setLoading(true)
+    setUploadingImages(true)
+    
     try {
-      await equipmentAPI.update(editingEquipment.id, equipmentForm)
+      let updateData = { ...equipmentForm }
+      
+      // Upload new images if any were selected
+      if (equipmentImages.length > 0) {
+        const formData = new FormData()
+        equipmentImages.forEach(file => {
+          formData.append('files', file)
+        })
+        
+        const uploadResponse = await fetch('/api/upload/images', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          },
+          body: formData
+        })
+        
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload images')
+        }
+        
+        const uploadData = await uploadResponse.json()
+        updateData.image_urls = uploadData.image_urls
+      }
+      
+      setUploadingImages(false)
+      
+      await equipmentAPI.update(editingEquipment.id, updateData)
       setShowEditDialog(false)
       setEditingEquipment(null)
       setEquipmentForm({ name: '', description: '', category: 'power', daily_price: '', weekly_price: '', monthly_price: '', capacity_spec: '', image_url: '', location: '', security_deposit: '' })
+      setEquipmentImages([])
+      setImagePreviewUrls([])
       loadMyEquipment()
       loadEquipment()
       alert('Equipment updated successfully!')
     } catch (error) {
-      alert(error.response?.data?.error || 'Failed to update equipment')
+      alert(error.response?.data?.error || error.message || 'Failed to update equipment')
     } finally {
       setLoading(false)
+      setUploadingImages(false)
     }
   }
 
@@ -1550,14 +1585,52 @@ function App() {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-image_url">Image URL</Label>
-                <Input
-                  id="edit-image_url"
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={equipmentForm.image_url}
-                  onChange={(e) => setEquipmentForm({...equipmentForm, image_url: e.target.value})}
-                />
+                <Label htmlFor="edit-equipment_images">Equipment Photos (Up to 5)</Label>
+                <div className="mt-2">
+                  <Input
+                    id="edit-equipment_images"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+                    multiple
+                    onChange={handleImageSelect}
+                    className="cursor-pointer"
+                  />
+                  <p className="text-sm text-slate-500 mt-1">Max 5 images, 5MB each (PNG, JPG, GIF, WEBP)</p>
+                </div>
+                
+                {/* Image Previews */}
+                {imagePreviewUrls.length > 0 && (
+                  <div className="mt-4 grid grid-cols-5 gap-2">
+                    {imagePreviewUrls.map((url, index) => (
+                      <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-slate-200">
+                        <img src={url} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(index)}
+                          className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                        >
+                          <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Show current images if no new images selected */}
+                {imagePreviewUrls.length === 0 && editingEquipment?.image_urls && editingEquipment.image_urls.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-sm text-slate-600 mb-2">Current images:</p>
+                    <div className="grid grid-cols-5 gap-2">
+                      {editingEquipment.image_urls.map((url, index) => (
+                        <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-slate-200">
+                          <img src={url} alt={`Current ${index + 1}`} className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button type="submit" className="flex-1" disabled={loading}>
