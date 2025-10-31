@@ -1,0 +1,22 @@
+# Ignore backend and Python files
+backend/
+src/
+*.py
+requirements.txt
+wsgi.py
+runtime.txt
+*.md
+assets/
+contract_analysis.md
+database-schema.md
+deployment_and_testing_guide.md
+faq_content.md
+nixpacks.toml
+railpack.json
+railway.json
+render.yaml
+reset_database.html
+the-wild-share-deployment.tar.gz
+the-wild-share-v2-stripe-connect.tar.gz
+update_cors_for_vercel.py
+
