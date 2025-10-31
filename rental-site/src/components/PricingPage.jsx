@@ -1,300 +1,380 @@
 import React from 'react'
-import { Check, X, Zap, Briefcase, Gift } from 'lucide-react'
+import { Check, Zap, TrendingUp, Home, Gift } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-const PricingPage = ({ user, onUpgrade, onViewChange }) => {
-  const currentTier = user?.subscription_tier || 'free'
-
-  const tiers = [
+const PricingPage = ({ user, onViewChange }) => {
+  const boostOptions = [
     {
-      id: 'free',
-      name: 'Free',
-      price: 0,
-      period: 'forever',
-      description: 'Perfect for trying out the platform',
-      icon: Gift,
-      color: 'text-gray-600',
-      bgColor: 'bg-gray-50',
-      borderColor: 'border-gray-200',
-      features: [
-        { text: 'List up to 3 items', included: true },
-        { text: 'Basic listing photos (3 per item)', included: true },
-        { text: 'Standard search visibility', included: true },
-        { text: 'Full messaging access', included: true, highlight: true },
-        { text: 'Profile reviews (give & receive)', included: true, highlight: true },
-        { text: 'Basic rental contract template', included: true, highlight: true },
-        { text: '50% deposit option', included: true, highlight: true },
-        { text: 'Secure payment processing', included: true },
-        { text: '7-day booking window', included: true },
-        { text: 'NO transaction fees', included: true, highlight: true },
-        { text: 'NO hidden costs', included: true, highlight: true },
-        { text: 'Unlimited listings', included: false },
-        { text: 'Priority search placement', included: false },
-        { text: 'Advanced analytics', included: false },
-        { text: 'Premium contracts', included: false }
-      ]
-    },
-    {
-      id: 'pro',
-      name: 'Pro Owner',
-      price: 5,
-      period: 'month',
-      description: 'For active owners with multiple items',
+      id: 'boost_7_days',
+      name: 'Boost 7 Days',
+      price: 2.99,
       icon: Zap,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-500',
       popular: true,
       features: [
-        { text: 'Everything in Free, PLUS:', included: true, bold: true },
-        { text: 'Unlimited listings', included: true, highlight: true },
-        { text: 'Priority search placement', included: true, highlight: true },
-        { text: 'Up to 10 photos per item', included: true },
-        { text: 'Advanced analytics dashboard', included: true },
-        { text: 'Featured badge on all listings', included: true },
-        { text: 'Flexible pricing options', included: true },
-        { text: 'Instant booking option', included: true },
-        { text: '30-day booking window', included: true },
-        { text: 'Bulk editing tools', included: true },
-        { text: 'Priority customer support', included: true },
-        { text: 'Revenue insights and reports', included: true },
-        { text: 'Promotional tools (discount codes)', included: true },
-        { text: 'Keep 100% of your earnings', included: true, highlight: true },
-        { text: 'Premium rental contract templates', included: true, highlight: true },
-        { text: 'Contract customization tools', included: true, highlight: true },
-        { text: 'Legal protection for both parties', included: true, highlight: true }
+        'Top of search results for 7 days',
+        'Increased visibility',
+        'More inquiries and bookings',
+        'Perfect for quick rentals',
+        'Best value for short-term boost'
       ]
     },
     {
-      id: 'business',
-      name: 'Business',
-      price: 20,
-      period: 'month',
-      description: 'For rental businesses & outfitters',
-      icon: Briefcase,
+      id: 'boost_30_days',
+      name: 'Boost 30 Days',
+      price: 9.99,
+      icon: TrendingUp,
+      color: 'text-green-600',
+      bgColor: 'bg-green-50',
+      borderColor: 'border-green-500',
+      features: [
+        'Top of search results for 30 days',
+        'Maximum visibility all month',
+        'Consistent bookings',
+        'Best for high-value items',
+        'Save 66% vs. daily boosting'
+      ]
+    },
+    {
+      id: 'homepage_featured',
+      name: 'Homepage Featured',
+      price: 19.99,
+      icon: Home,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-500',
       features: [
-        { text: 'Everything in Pro, PLUS:', included: true, bold: true },
-        { text: 'Verified Business Badge', included: true, highlight: true },
-        { text: 'Custom branding on listings', included: true },
-        { text: 'Multi-user access (team accounts)', included: true },
-        { text: 'Advanced inventory management', included: true },
-        { text: 'Automated pricing suggestions', included: true },
-        { text: 'Dedicated account manager', included: true },
-        { text: 'Custom insurance options', included: true },
-        { text: 'Priority placement in all searches', included: true },
-        { text: 'Featured homepage placement', included: true },
-        { text: 'Keep 100% of your earnings', included: true, highlight: true },
-        { text: 'Premium contract templates (customizable)', included: true, highlight: true },
-        { text: 'Liability waivers included', included: true, highlight: true },
-        { text: 'Insurance documentation support', included: true },
-        { text: 'Dispute resolution assistance', included: true },
-        { text: 'Legal consultation (1 hour/year)', included: true, highlight: true }
+        'Featured on homepage carousel',
+        'Maximum exposure to all visitors',
+        'Premium placement for 7 days',
+        'Best for unique/premium items',
+        'Highest conversion rate'
       ]
     }
   ]
-
-  const handleSelectPlan = (tierId) => {
-    if (!user) {
-      alert('Please sign in to subscribe')
-      return
-    }
-
-    if (tierId === 'free') {
-      alert('You\'re already on the free plan!')
-      return
-    }
-
-    if (tierId === currentTier) {
-      alert(`You're already subscribed to ${tierId === 'pro' ? 'Pro' : 'Business'}!`)
-      return
-    }
-
-    onUpgrade(tierId)
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
+          <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-2 rounded-full font-semibold mb-6">
+            <Gift className="w-5 h-5" />
+            <span>Everything is FREE!</span>
+          </div>
+          
           <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Simple, Transparent Pricing
+            List for Free, Boost When You Want
           </h1>
-          <p className="text-xl text-gray-600 mb-6">
-            Choose the plan that's right for you. No hidden fees, ever.
+          <p className="text-xl text-gray-600 mb-6 max-w-3xl mx-auto">
+            Create unlimited listings at no cost. Only pay when you want to boost your listing to the top. 
+            No subscriptions, no transaction fees, no hidden costs.
           </p>
-          <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-6 py-3 rounded-full font-semibold">
-            <Check className="w-5 h-5" />
-            <span>NO Transaction Fees • Keep 100% of Your Earnings</span>
+          
+          <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto mb-8">
+            <div className="bg-white p-6 rounded-lg shadow-sm border-2 border-green-500">
+              <Check className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <h3 className="font-semibold mb-1">Unlimited Listings</h3>
+              <p className="text-sm text-gray-600">List as many items as you want, forever free</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border-2 border-green-500">
+              <Check className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <h3 className="font-semibold mb-1">No Transaction Fees</h3>
+              <p className="text-sm text-gray-600">Keep 100% of your earnings, always</p>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border-2 border-green-500">
+              <Check className="w-8 h-8 text-green-600 mx-auto mb-2" />
+              <h3 className="font-semibold mb-1">Pay Only to Boost</h3>
+              <p className="text-sm text-gray-600">Boost individual listings when you need visibility</p>
+            </div>
           </div>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          {tiers.map((tier) => {
-            const Icon = tier.icon
-            const isCurrentTier = currentTier === tier.id
-
-            return (
-              <Card 
-                key={tier.id}
-                className={`relative ${tier.popular ? 'ring-2 ring-blue-500 shadow-xl scale-105' : 'shadow-lg'} ${tier.borderColor} transition-all hover:shadow-2xl`}
-              >
-                {tier.popular && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <Badge className="bg-blue-500 text-white px-4 py-1 text-sm font-semibold">
-                      MOST POPULAR
-                    </Badge>
-                  </div>
-                )}
-
-                {isCurrentTier && (
-                  <div className="absolute -top-4 right-4">
-                    <Badge className="bg-green-500 text-white px-3 py-1 text-xs font-semibold">
-                      CURRENT PLAN
-                    </Badge>
-                  </div>
-                )}
-
-                <CardHeader className={`${tier.bgColor} rounded-t-lg`}>
-                  <div className="flex items-center gap-3 mb-2">
-                    <Icon className={`w-8 h-8 ${tier.color}`} />
-                    <CardTitle className="text-2xl">{tier.name}</CardTitle>
-                  </div>
-                  <CardDescription className="text-base">{tier.description}</CardDescription>
-                  
-                  <div className="mt-6">
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-5xl font-bold">${tier.price}</span>
-                      <span className="text-gray-600">/{tier.period}</span>
+        {/* What's Free Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">Everything You Need, Completely Free</h2>
+          <Card className="max-w-4xl mx-auto">
+            <CardContent className="pt-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Unlimited Listings</p>
+                      <p className="text-sm text-gray-600">List as much gear as you want</p>
                     </div>
-                    {tier.id === 'pro' && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        Pays for itself with just 1-2 rentals!
-                      </p>
-                    )}
                   </div>
-                </CardHeader>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Full Messaging</p>
+                      <p className="text-sm text-gray-600">Chat with renters unlimited</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Profile Reviews</p>
+                      <p className="text-sm text-gray-600">Build your reputation</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Rental Contracts</p>
+                      <p className="text-sm text-gray-600">Legal protection included</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">50% Deposit Option</p>
+                      <p className="text-sm text-gray-600">Flexible payment for renters</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Secure Payments</p>
+                      <p className="text-sm text-gray-600">Stripe-powered processing</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">Calendar Management</p>
+                      <p className="text-sm text-gray-600">Track bookings easily</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-semibold">NO Transaction Fees</p>
+                      <p className="text-sm text-gray-600">Keep 100% of earnings</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-                <CardContent className="pt-6">
-                  <ul className="space-y-3">
-                    {tier.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        {feature.included ? (
-                          <Check className={`w-5 h-5 flex-shrink-0 mt-0.5 ${feature.highlight ? 'text-green-600' : 'text-gray-400'}`} />
-                        ) : (
-                          <X className="w-5 h-5 flex-shrink-0 mt-0.5 text-gray-300" />
-                        )}
-                        <span className={`text-sm ${feature.bold ? 'font-semibold text-gray-900' : 'text-gray-600'} ${feature.highlight ? 'text-green-700 font-medium' : ''} ${!feature.included ? 'text-gray-400 line-through' : ''}`}>
-                          {feature.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
+        {/* Boost Options */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-4">Boost Your Listings When You Need Visibility</h2>
+          <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+            Your listings are always visible. Boost them to the top of search results when you want more bookings.
+          </p>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            {boostOptions.map((option) => {
+              const Icon = option.icon
 
-                <CardFooter>
-                  <Button
-                    onClick={() => handleSelectPlan(tier.id)}
-                    disabled={isCurrentTier}
-                    className={`w-full ${
-                      tier.popular 
-                        ? 'bg-blue-600 hover:bg-blue-700' 
-                        : tier.id === 'business'
-                        ? 'bg-purple-600 hover:bg-purple-700'
-                        : 'bg-gray-600 hover:bg-gray-700'
-                    } ${isCurrentTier ? 'opacity-50 cursor-not-allowed' : ''}`}
-                  >
-                    {isCurrentTier ? 'Current Plan' : tier.id === 'free' ? 'Get Started Free' : `Upgrade to ${tier.name}`}
-                  </Button>
-                </CardFooter>
-              </Card>
-            )
-          })}
+              return (
+                <Card 
+                  key={option.id}
+                  className={`relative ${option.popular ? 'ring-2 ring-blue-500 shadow-xl scale-105' : 'shadow-lg'} ${option.borderColor} transition-all hover:shadow-2xl`}
+                >
+                  {option.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <Badge className="bg-blue-500 text-white px-4 py-1 text-sm font-semibold">
+                        MOST POPULAR
+                      </Badge>
+                    </div>
+                  )}
+
+                  <CardHeader className={`${option.bgColor} rounded-t-lg`}>
+                    <div className="flex items-center gap-3 mb-2">
+                      <Icon className={`w-8 h-8 ${option.color}`} />
+                      <CardTitle className="text-2xl">{option.name}</CardTitle>
+                    </div>
+                    
+                    <div className="mt-6">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-5xl font-bold">${option.price}</span>
+                        <span className="text-gray-600">one-time</span>
+                      </div>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="pt-6">
+                    <ul className="space-y-3">
+                      {option.features.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                          <Check className="w-5 h-5 flex-shrink-0 mt-0.5 text-green-600" />
+                          <span className="text-sm text-gray-600">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+
+                  <CardFooter>
+                    <Button
+                      onClick={() => {
+                        if (!user) {
+                          alert('Please sign in to boost listings')
+                          return
+                        }
+                        onViewChange('equipment')
+                      }}
+                      className={`w-full ${
+                        option.id === 'boost_7_days'
+                          ? 'bg-blue-600 hover:bg-blue-700'
+                          : option.id === 'boost_30_days'
+                          ? 'bg-green-600 hover:bg-green-700'
+                          : 'bg-purple-600 hover:bg-purple-700'
+                      }`}
+                    >
+                      Boost a Listing
+                    </Button>
+                  </CardFooter>
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* How It Works */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">How It Works</h2>
+          <div className="grid md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-blue-600">1</span>
+                </div>
+                <CardTitle className="text-lg">List Your Gear</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">
+                  Create unlimited listings for free. Add photos, descriptions, and pricing.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-green-600">2</span>
+                </div>
+                <CardTitle className="text-lg">Get Bookings</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">
+                  Renters find your gear, message you, and book. You keep 100% of earnings.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-purple-600">3</span>
+                </div>
+                <CardTitle className="text-lg">Boost When Needed</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">
+                  Want more visibility? Boost your listing to the top for just a few dollars.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-2xl font-bold text-orange-600">4</span>
+                </div>
+                <CardTitle className="text-lg">Earn More</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-600">
+                  Boosted listings get 3-5x more views and bookings. Pay only when you need it.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl font-bold text-center mb-8">Frequently Asked Questions</h2>
           
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Are there really no transaction fees?</CardTitle>
+                <CardTitle className="text-lg">Is it really completely free to list?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Yes! Unlike other platforms that charge 10-20% per transaction, we charge ZERO fees. 
-                  You keep 100% of what you earn. We only charge a simple monthly subscription.
+                  Yes! You can create unlimited listings, message renters, get reviews, and use rental contracts 
+                  completely free. We only charge when you choose to boost a listing for extra visibility.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Can I cancel anytime?</CardTitle>
+                <CardTitle className="text-lg">Do you take a percentage of my earnings?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Absolutely! You can cancel your Pro or Business subscription at any time. 
-                  Your plan will remain active until the end of your billing period, then you'll be moved to the Free plan.
+                  No! Unlike other platforms that take 10-20% of every rental, we charge ZERO transaction fees. 
+                  You keep 100% of what you earn. We only make money when you choose to boost listings.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">What happens if I downgrade?</CardTitle>
+                <CardTitle className="text-lg">When should I boost my listing?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  If you downgrade from Pro/Business to Free, you'll keep all your existing listings, 
-                  but you won't be able to add more than 3 items. Your analytics and premium features will be disabled, 
-                  but your data is safe and will be restored if you upgrade again.
+                  Boost when you want more bookings! Great times to boost: new listings, slow seasons, 
+                  high-value items, or when you have availability and want to fill it quickly.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">How does the 50% deposit option work?</CardTitle>
+                <CardTitle className="text-lg">How much more visibility do boosted listings get?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Renters can choose to pay 50% when booking and 50% at pickup. This makes expensive items 
-                  more accessible and increases booking rates. You're still fully protected, and the remaining 
-                  payment is automatically charged at the start date.
+                  Boosted listings appear at the top of search results and get 3-5x more views on average. 
+                  Homepage featured listings get even more exposure, appearing on the homepage to all visitors.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">What's included in the rental contracts?</CardTitle>
+                <CardTitle className="text-lg">Can I boost multiple listings?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Free users get a basic rental agreement template. Pro users get premium templates with 
-                  customization options. Business users get fully customizable contracts, liability waivers, 
-                  and insurance documentation. All contracts include damage protection, late return policies, 
-                  and cancellation terms.
+                  Absolutely! You can boost as many listings as you want. Each boost is independent, 
+                  so you can boost different items for different durations based on your needs.
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Can I try Pro before committing?</CardTitle>
+                <CardTitle className="text-lg">What happens when my boost expires?</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600">
-                  Yes! We offer a 30-day free trial for Pro subscriptions. Try all the premium features 
-                  risk-free, and cancel anytime during the trial with no charges.
+                  Your listing returns to normal search results. It's still visible and bookable, 
+                  just not at the top. You can boost it again anytime if you want more visibility.
                 </p>
               </CardContent>
             </Card>
@@ -302,12 +382,13 @@ const PricingPage = ({ user, onUpgrade, onViewChange }) => {
         </div>
 
         {/* CTA Section */}
-        <div className="mt-16 text-center">
+        <div className="text-center">
           <Card className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none">
             <CardContent className="py-12">
-              <h2 className="text-3xl font-bold mb-4">Ready to Start Earning?</h2>
-              <p className="text-xl mb-8 opacity-90">
-                Join hundreds of outdoor enthusiasts making money from gear sitting in their garage.
+              <h2 className="text-3xl font-bold mb-4">Start Listing for Free Today</h2>
+              <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
+                Join hundreds of outdoor enthusiasts earning money from gear sitting in their garage. 
+                No subscriptions, no fees, just pure earnings.
               </p>
               <div className="flex gap-4 justify-center">
                 <Button 
@@ -315,7 +396,7 @@ const PricingPage = ({ user, onUpgrade, onViewChange }) => {
                   size="lg"
                   className="bg-white text-blue-600 hover:bg-gray-100"
                 >
-                  List Your First Item
+                  List Your First Item Free
                 </Button>
                 <Button 
                   onClick={() => onViewChange('browse')}
