@@ -15,6 +15,7 @@ class Equipment(db.Model):
     image_url = db.Column(db.String(255))  # Legacy single image
     image_urls = db.Column(db.Text)  # JSON array of multiple image URLs
     location = db.Column(db.String(255))  # City, State or full address
+    security_deposit = db.Column(db.Float, default=0.0)  # Owner-specified refundable deposit
     is_available = db.Column(db.Boolean, default=True)
     average_rating = db.Column(db.Float, default=0.0)  # Average rating from reviews
     
@@ -72,6 +73,7 @@ class Equipment(db.Model):
             'image_url': self.image_url,
             'image_urls': json.loads(self.image_urls) if self.image_urls else ([self.image_url] if self.image_url else []),
             'location': self.location,
+            'security_deposit': self.security_deposit,
             'is_available': self.is_available,
             'is_boosted': self.is_boosted,
             'boost_expires_at': self.boost_expires_at.isoformat() if self.boost_expires_at else None,

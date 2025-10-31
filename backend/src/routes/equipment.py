@@ -242,6 +242,7 @@ def create_equipment():
         image_url=image_urls[0] if image_urls else None,  # First image as primary
         image_urls=json.dumps(image_urls) if image_urls else None,  # All images as JSON
         location=data.get('location'),
+        security_deposit=float(data.get('security_deposit', 0)),  # Owner-specified deposit
         is_available=data.get('is_available', True)
     )
     
@@ -294,6 +295,8 @@ def update_equipment(equipment_id):
         equipment.image_urls = json.dumps([data['image_url']]) if data['image_url'] else None
     if 'location' in data:
         equipment.location = data['location']
+    if 'security_deposit' in data:
+        equipment.security_deposit = float(data['security_deposit'])
     if 'is_available' in data:
         equipment.is_available = data['is_available']
     

@@ -135,6 +135,9 @@ def run_migrations(app):
                 if 'total_boosts_purchased' not in existing_columns:
                     equipment_migrations.append("ALTER TABLE equipment ADD COLUMN total_boosts_purchased INTEGER DEFAULT 0")
                 
+                if 'security_deposit' not in existing_columns:
+                    equipment_migrations.append("ALTER TABLE equipment ADD COLUMN security_deposit FLOAT DEFAULT 0.0")
+                
                 # Execute equipment table migrations
                 for migration in equipment_migrations:
                     try:
