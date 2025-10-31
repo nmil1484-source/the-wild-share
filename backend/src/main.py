@@ -45,7 +45,19 @@ app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-
 app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(days=30)
 
 # Enable CORS for all routes
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "https://the-wild-share-frontend.vercel.app",
+            "https://thewildshare.com",
+            "http://localhost:5173",
+            "http://localhost:3000"
+        ],
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
 
 # Initialize extensions
 jwt = JWTManager(app)
