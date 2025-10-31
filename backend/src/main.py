@@ -130,7 +130,11 @@ app.register_blueprint(boost_bp, url_prefix='/api/boost')
 # Serve static assets (CSS, JS, images)
 @app.route('/assets/<path:path>')
 def serve_assets(path):
-    return send_from_directory(os.path.join(app.static_folder, 'assets'), path)
+    response = send_from_directory(os.path.join(app.static_folder, 'assets'), path)
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 # Serve uploaded images
 @app.route('/uploads/<path:filename>')
@@ -149,15 +153,27 @@ def health():
 def serve(path):
     # If path is empty or doesn't exist, serve index.html
     if path == '':
-        return send_from_directory(app.static_folder, 'index.html')
+        response = send_from_directory(app.static_folder, 'index.html')
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     
     # Check if the file exists in static folder
     file_path = os.path.join(app.static_folder, path)
     if os.path.exists(file_path) and os.path.isfile(file_path):
-        return send_from_directory(app.static_folder, path)
+        response = send_from_directory(app.static_folder, path)
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     
     # For all other routes (React Router), serve index.html
-    return send_from_directory(app.static_folder, 'index.html')
+    response = send_from_directory(app.static_folder, 'index.html')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 
 if __name__ == '__main__':
