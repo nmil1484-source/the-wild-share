@@ -16,6 +16,9 @@ import PricingPage from './components/PricingPage'
 import BoostSelectionModal from './components/BoostSelectionModal'
 import { TermsOfServiceView, PrivacyPolicyView } from './legal_views'
 
+// API URL - use environment variable or fallback to empty string for same-origin
+const API_URL = import.meta.env.VITE_API_URL || ''
+
 function App() {
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [user, setUser] = useState(null)
