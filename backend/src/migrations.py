@@ -94,7 +94,16 @@ def run_migrations(app):
                 except Exception as e:
                     logger.warning(f"⚠️  Could not create indexes: {e}")
                 
-                # Migration 3: Add boost fields to equipment table
+                # Migration 3: Increase capacity_spec column size
+                logger.info("Running migration: Increase capacity_spec column size")
+                try:
+                    conn.execute(text("ALTER TABLE equipment ALTER COLUMN capacity_spec TYPE VARCHAR(500)"))
+                    conn.commit()
+                    logger.info("✅ Increased capacity_spec column size to 500")
+                except Exception as e:
+                    logger.warning(f"⚠️  Could not increase capacity_spec size: {e}")
+                
+                # Migration 4: Add boost fields to equipment table
                 logger.info("Running migration: Add boost fields to equipment table")
                 
                 result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='equipment'"))

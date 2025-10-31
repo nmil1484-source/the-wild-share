@@ -11,7 +11,7 @@ class Equipment(db.Model):
     daily_price = db.Column(db.Float, nullable=False)
     weekly_price = db.Column(db.Float, nullable=True)
     monthly_price = db.Column(db.Float, nullable=True)
-    capacity_spec = db.Column(db.String(50))
+    capacity_spec = db.Column(db.String(500))  # Increased from 50 to allow detailed specs
     image_url = db.Column(db.String(255))  # Legacy single image
     image_urls = db.Column(db.Text)  # JSON array of multiple image URLs
     location = db.Column(db.String(255))  # City, State or full address
