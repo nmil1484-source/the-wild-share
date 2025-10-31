@@ -55,7 +55,8 @@ function App() {
     monthly_price: '',
     capacity_spec: '',
     image_url: '',
-    location: ''
+    location: '',
+    security_deposit: ''
   })
   const [equipmentImages, setEquipmentImages] = useState([])
   const [imagePreviewUrls, setImagePreviewUrls] = useState([])
@@ -492,7 +493,7 @@ function App() {
       })
       
       // Reset form
-      setEquipmentForm({ name: '', description: '', category: 'bikes', daily_price: '', weekly_price: '', monthly_price: '', capacity_spec: '', image_url: '', location: '' })
+      setEquipmentForm({ name: '', description: '', category: 'bikes', daily_price: '', weekly_price: '', monthly_price: '', capacity_spec: '', image_url: '', location: '', security_deposit: '' })
       setEquipmentImages([])
       setImagePreviewUrls([])
       
@@ -518,7 +519,8 @@ function App() {
       monthly_price: item.monthly_price,
       capacity_spec: item.capacity_spec,
       image_url: item.image_url,
-      location: item.location
+      location: item.location,
+      security_deposit: item.security_deposit || ''
     })
     setShowEditDialog(true)
   }
@@ -530,7 +532,7 @@ function App() {
       await equipmentAPI.update(editingEquipment.id, equipmentForm)
       setShowEditDialog(false)
       setEditingEquipment(null)
-      setEquipmentForm({ name: '', description: '', category: 'power', daily_price: '', weekly_price: '', monthly_price: '', capacity_spec: '', image_url: '', location: '' })
+      setEquipmentForm({ name: '', description: '', category: 'power', daily_price: '', weekly_price: '', monthly_price: '', capacity_spec: '', image_url: '', location: '', security_deposit: '' })
       loadMyEquipment()
       loadEquipment()
       alert('Equipment updated successfully!')
@@ -1322,6 +1324,18 @@ function App() {
                     </div>
                   </div>
                   <div>
+                    <Label htmlFor="security_deposit">Refundable Security Deposit ($)</Label>
+                    <Input
+                      id="security_deposit"
+                      type="number"
+                      step="0.01"
+                      placeholder="0.00"
+                      value={equipmentForm.security_deposit || ''}
+                      onChange={(e) => setEquipmentForm({...equipmentForm, security_deposit: e.target.value})}
+                    />
+                    <p className="text-sm text-gray-500 mt-1">Optional: Amount renters must pay as a refundable deposit</p>
+                  </div>
+                  <div>
                     <Label htmlFor="capacity_spec">Specifications</Label>
                     <Input
                       id="capacity_spec"
@@ -1513,6 +1527,18 @@ function App() {
                     onChange={(e) => setEquipmentForm({...equipmentForm, monthly_price: e.target.value})}
                   />
                 </div>
+              </div>
+              <div>
+                <Label htmlFor="edit-security_deposit">Refundable Security Deposit ($)</Label>
+                <Input
+                  id="edit-security_deposit"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={equipmentForm.security_deposit || ''}
+                  onChange={(e) => setEquipmentForm({...equipmentForm, security_deposit: e.target.value})}
+                />
+                <p className="text-sm text-gray-500 mt-1">Optional: Amount renters must pay as a refundable deposit</p>
               </div>
               <div>
                 <Label htmlFor="edit-capacity_spec">Specifications</Label>
