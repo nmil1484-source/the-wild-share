@@ -13,6 +13,7 @@ import { authAPI, equipmentAPI, bookingsAPI, identityAPI, messagesAPI, reviewsAP
 import StripeCheckout from './components/StripeCheckout'
 import AdminDashboard from './components/AdminDashboard'
 import PricingPage from './components/PricingPage'
+import BoostSelectionModal from './components/BoostSelectionModal'
 import { TermsOfServiceView, PrivacyPolicyView } from './legal_views'
 
 function App() {
@@ -102,6 +103,15 @@ function App() {
     owner_review: ''
   })
 
+  // Boost purchase states
+  const [showBoostModal, setShowBoostModal] = useState(false)
+  const [selectedBoostType, setSelectedBoostType] = useState(null)
+  const [boostPricing] = useState({
+    boost_7_days: { name: 'Boost 7 Days', price: 2.99, duration_days: 7 },
+    boost_30_days: { name: 'Boost 30 Days', price: 9.99, duration_days: 30 },
+    homepage_featured: { name: 'Homepage Featured', price: 19.99, duration_days: 7 }
+  })
+
   const categories = [
     { id: 'all', name: 'All Equipment', icon: Mountain },
     { id: 'bikes', name: 'Bikes & Racks', icon: Bike },
@@ -183,6 +193,18 @@ function App() {
       })
     }
   }, [user])
+
+  // Check for Stripe boost success callback
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const sessionId = urlParams.get('session_id')
+    
+    if (sessionId && window.location.pathname.includes('/boost/success')) {
+      handleBoostSuccess(sessionId)
+      // Clean up URL
+      window.history.replaceState({}, document.title, '/equipment')
+    }
+  }, [])
 
   const loadUser = async () => {
     try {
@@ -643,6 +665,77 @@ function App() {
     setCurrentBooking(null)
     setSelectedEquipment(null)
     setBookingForm({ equipment_id: null, start_date: '', end_date: '' })
+  }
+
+  // Boost purchase handler
+  const handleBoostPurchase = async (equipmentId, boostType) => {
+    if (!equipmentId) {
+      alert('Please select an equipment to boost')
+      return
+    }
+    
+    setLoading(true)
+    
+    try {
+      const response = await fetch(`${API_URL}/api/boost/purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: JSON.stringify({
+          equipment_id: equipmentId,
+          boost_type: boostType
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        // Redirect to Stripe checkout
+        window.location.href = data.checkout_url
+      } else {
+        alert(data.error || 'Failed to create checkout session')
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error('Boost purchase error:', error)
+      alert('Error creating checkout session: ' + error.message)
+      setLoading(false)
+    }
+  }
+
+  // Handle boost success callback from Stripe
+  const handleBoostSuccess = async (sessionId) => {
+    setLoading(true)
+    
+    try {
+      const response = await fetch(`${API_URL}/api/boost/success`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+        },
+        body: JSON.stringify({
+          session_id: sessionId
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        alert(`🎉 Boost activated successfully! Your equipment will be featured until ${new Date(data.expires_at).toLocaleDateString()}`)
+        setCurrentView('equipment')
+        fetchMyEquipment() // Refresh equipment list
+      } else {
+        alert(data.error || 'Failed to activate boost')
+      }
+    } catch (error) {
+      console.error('Boost success error:', error)
+      alert('Error activating boost: ' + error.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleUpdateProfile = async (e) => {
@@ -2665,11 +2758,11 @@ function App() {
         {currentView === 'pricing' && (
           <PricingPage 
             user={user} 
-            onUpgrade={(tier) => {
-              // TODO: Implement Stripe checkout
-              alert(`Upgrading to ${tier}! Stripe integration coming soon.`)
-            }}
             onViewChange={setCurrentView}
+            onBoostClick={(boostType) => {
+              setSelectedBoostType(boostType)
+              setShowBoostModal(true)
+            }}
           />
         )}
 
@@ -2900,6 +2993,19 @@ function App() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Boost Selection Modal */}
+      <BoostSelectionModal
+        open={showBoostModal}
+        onClose={() => setShowBoostModal(false)}
+        boostType={selectedBoostType}
+        boostPricing={boostPricing}
+        myEquipment={myEquipment}
+        onSelect={(equipmentId) => {
+          setShowBoostModal(false)
+          handleBoostPurchase(equipmentId, selectedBoostType)
+        }}
+      />
 
     </div>
   )

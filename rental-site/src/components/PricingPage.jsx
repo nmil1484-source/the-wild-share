@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
-const PricingPage = ({ user, onViewChange }) => {
+const PricingPage = ({ user, onViewChange, onBoostClick }) => {
   const boostOptions = [
     {
       id: 'boost_7_days',
@@ -221,7 +221,9 @@ const PricingPage = ({ user, onViewChange }) => {
                           alert('Please sign in to boost listings')
                           return
                         }
-                        onViewChange('equipment')
+                        if (onBoostClick) {
+                          onBoostClick(option.id)
+                        }
                       }}
                       className={`w-full ${
                         option.id === 'boost_7_days'
