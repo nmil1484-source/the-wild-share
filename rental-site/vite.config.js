@@ -22,7 +22,7 @@ export default defineConfig({
     })
   },
   build: {
-    outDir: '../src/static',
+    outDir: '../backend/src/static',
     emptyOutDir: true,
     rollupOptions: {
       output: {
