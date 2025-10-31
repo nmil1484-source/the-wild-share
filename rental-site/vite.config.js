@@ -1,3 +1,4 @@
+// Force rebuild - Oct 31 2025 00:48
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
