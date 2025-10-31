@@ -8,7 +8,7 @@ import { paymentsAPI } from '../lib/api'
 
 // Initialize Stripe with your publishable key
 // This will be loaded from environment variable
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_placeholder')
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51SJPdQGW9js9GVkoZfMrWFNQkyGJGyW9Ls6Aisq4tGlYN2UNLG9HvS36YwjO51kHNTKvIgx5ImLK6I8PpjEV2zg700WKXnDRQ5')
 
 export default function StripeCheckout({ booking, equipment, onSuccess, onCancel }) {
   const [clientSecret, setClientSecret] = useState('')
