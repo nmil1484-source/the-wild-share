@@ -37,6 +37,7 @@ from src.routes.sample_contract import sample_contract_bp
 from src.routes.admin import admin_bp
 from src.routes.admin_moderation import admin_mod_bp
 from src.routes.subscription import subscription_bp
+from src.routes.boost import boost_bp
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
@@ -124,6 +125,7 @@ app.register_blueprint(sample_contract_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
 app.register_blueprint(admin_mod_bp, url_prefix='/api')
 app.register_blueprint(subscription_bp, url_prefix='/api/subscription')
+app.register_blueprint(boost_bp, url_prefix='/api/boost')
 
 # Serve static assets (CSS, JS, images)
 @app.route('/assets/<path:path>')

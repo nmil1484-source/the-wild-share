@@ -24,6 +24,13 @@ class Equipment(db.Model):
     approved_at = db.Column(db.DateTime)
     rejection_reason = db.Column(db.Text)
     
+    # Boost/Featured fields
+    is_boosted = db.Column(db.Boolean, default=False)
+    boost_expires_at = db.Column(db.DateTime)
+    is_homepage_featured = db.Column(db.Boolean, default=False)
+    homepage_featured_expires_at = db.Column(db.DateTime)
+    total_boosts_purchased = db.Column(db.Integer, default=0)
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -66,6 +73,10 @@ class Equipment(db.Model):
             'image_urls': json.loads(self.image_urls) if self.image_urls else ([self.image_url] if self.image_url else []),
             'location': self.location,
             'is_available': self.is_available,
+            'is_boosted': self.is_boosted,
+            'boost_expires_at': self.boost_expires_at.isoformat() if self.boost_expires_at else None,
+            'is_homepage_featured': self.is_homepage_featured,
+            'homepage_featured_expires_at': self.homepage_featured_expires_at.isoformat() if self.homepage_featured_expires_at else None,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'owner': owner_info
         }

@@ -94,6 +94,38 @@ def run_migrations(app):
                 except Exception as e:
                     logger.warning(f"⚠️  Could not create indexes: {e}")
                 
+                # Migration 3: Add boost fields to equipment table
+                logger.info("Running migration: Add boost fields to equipment table")
+                
+                result = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name='equipment'"))
+                existing_columns = [row[0] for row in result]
+                
+                equipment_migrations = []
+                
+                if 'is_boosted' not in existing_columns:
+                    equipment_migrations.append("ALTER TABLE equipment ADD COLUMN is_boosted BOOLEAN DEFAULT FALSE")
+                
+                if 'boost_expires_at' not in existing_columns:
+                    equipment_migrations.append("ALTER TABLE equipment ADD COLUMN boost_expires_at TIMESTAMP")
+                
+                if 'is_homepage_featured' not in existing_columns:
+                    equipment_migrations.append("ALTER TABLE equipment ADD COLUMN is_homepage_featured BOOLEAN DEFAULT FALSE")
+                
+                if 'homepage_featured_expires_at' not in existing_columns:
+                    equipment_migrations.append("ALTER TABLE equipment ADD COLUMN homepage_featured_expires_at TIMESTAMP")
+                
+                if 'total_boosts_purchased' not in existing_columns:
+                    equipment_migrations.append("ALTER TABLE equipment ADD COLUMN total_boosts_purchased INTEGER DEFAULT 0")
+                
+                # Execute equipment table migrations
+                for migration in equipment_migrations:
+                    try:
+                        conn.execute(text(migration))
+                        conn.commit()
+                        logger.info(f"✅ Executed: {migration}")
+                    except Exception as e:
+                        logger.warning(f"⚠️  Migration already applied or failed: {migration} - {e}")
+                
                 logger.info("🎉 All migrations completed successfully!")
                 
         except Exception as e:
