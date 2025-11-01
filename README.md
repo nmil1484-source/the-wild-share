@@ -89,3 +89,4 @@ Built with ❤️ for outdoor adventurers everywhere
 
 # Deployment Thu Oct 23 17:49:41 EDT 2025
 # Trigger deployment
+# Deploy with fixed root directory settings
