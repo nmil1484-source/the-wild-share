@@ -1,6 +1,5 @@
 {
-  "buildCommand": "bash build.sh",
-  "outputDirectory": "rental-site/dist",
-  "installCommand": "echo 'Install handled by build script'"
+  "buildCommand": "npm run build",
+  "outputDirectory": "rental-site/dist"
 }
 
