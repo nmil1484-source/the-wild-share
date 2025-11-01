@@ -1,8 +1,6 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "installCommand": "npm install",
-  "framework": "vite",
-  "cwd": "rental-site"
+  "buildCommand": "cd rental-site && npm run build",
+  "outputDirectory": "rental-site/dist",
+  "installCommand": "cd rental-site && npm install"
 }
 
