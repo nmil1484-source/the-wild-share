@@ -49,7 +49,9 @@ CORS(app, resources={
     r"/api/*": {
         "origins": [
             "https://the-wild-share-frontend.vercel.app",
+            "https://wild-share-rental.netlify.app",
             "https://thewildshare.com",
+            "https://www.thewildshare.com",
             "http://localhost:5173",
             "http://localhost:3000"
         ],
