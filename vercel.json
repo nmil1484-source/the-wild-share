@@ -2,11 +2,10 @@
   "buildCommand": "cd rental-site && npm run build",
   "outputDirectory": "rental-site/dist",
   "installCommand": "cd rental-site && npm install",
-  "framework": null,
-  "builds": [
+  "rewrites": [
     {
-      "src": "rental-site/package.json",
-      "use": "@vercel/static-build"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
