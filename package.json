@@ -1,8 +1,0 @@
-{
-  "name": "the-wild-share-monorepo",
-  "version": "1.0.0",
-  "scripts": {
-    "build": "cd rental-site && npm install && npm run build"
-  }
-}
-
