@@ -161,41 +161,13 @@ def serve_uploads(filename):
 def health():
     return jsonify({"status": "ok", "message": "The Wild Share API is running"})
 
-# Serve frontend - this MUST be last
-@app.route('/', defaults={'path': ''})
-@app.route('/<path:path>')
-def serve(path):
-    # Log the path for debugging
-    app.logger.warning(f"CATCH-ALL ROUTE HIT: path={path}")
-    
-    # Don't serve frontend for API routes - let them 404 properly
-    if path.startswith('api/'):
-        print(f"API route detected, returning 404")
-        return jsonify({'error': 'API endpoint not found'}), 404
-    
-    # If path is empty or doesn't exist, serve index.html
-    if path == '':
-        response = send_from_directory(app.static_folder, 'index.html')
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        return response
-    
-    # Check if the file exists in static folder
-    file_path = os.path.join(app.static_folder, path)
-    if os.path.exists(file_path) and os.path.isfile(file_path):
-        response = send_from_directory(app.static_folder, path)
-        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
-        return response
-    
-    # For all other routes (React Router), serve index.html
-    response = send_from_directory(app.static_folder, 'index.html')
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    return response
+# Serve frontend - DISABLED because frontend is hosted on Netlify
+# The backend only serves API endpoints
+# @app.route('/', defaults={'path': ''})
+# @app.route('/<path:path>')
+# def serve(path):
+#     # Frontend is on Netlify, backend only serves API
+#     pass
 
 
 if __name__ == '__main__':
