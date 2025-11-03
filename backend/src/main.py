@@ -166,7 +166,7 @@ def health():
 @app.route('/<path:path>')
 def serve(path):
     # Log the path for debugging
-    print(f"CATCH-ALL ROUTE HIT: path='{path}'")
+    app.logger.warning(f"CATCH-ALL ROUTE HIT: path={path}")
     
     # Don't serve frontend for API routes - let them 404 properly
     if path.startswith('api/'):
