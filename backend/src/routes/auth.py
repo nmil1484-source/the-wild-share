@@ -45,10 +45,45 @@ def register():
         'user': new_user.to_dict()
     }), 201
 
-# Alias route for frontend compatibility
+# Alias route for frontend compatibility - duplicates register logic
 @auth_bp.route('/signup', methods=['POST'])
 def signup():
-    return register()
+    data = request.get_json()
+    
+    # Validate required fields
+    required_fields = ['email', 'password', 'first_name', 'last_name']
+    for field in required_fields:
+        if field not in data:
+            return jsonify({'error': f'{field} is required'}), 400
+    
+    # Check if user already exists
+    if User.query.filter_by(email=data['email']).first():
+        return jsonify({'error': 'Email already registered'}), 400
+    
+    # Hash password
+    password_hash = generate_password_hash(data['password'])
+    
+    # Create new user
+    new_user = User(
+        email=data['email'],
+        password_hash=password_hash,
+        first_name=data['first_name'],
+        last_name=data['last_name'],
+        phone=data.get('phone'),
+        user_type=data.get('user_type', 'renter')
+    )
+    
+    db.session.add(new_user)
+    db.session.commit()
+    
+    # Create access token with string identity
+    access_token = create_access_token(identity=str(new_user.id))
+    
+    return jsonify({
+        'message': 'User registered successfully',
+        'access_token': access_token,
+        'user': new_user.to_dict()
+    }), 201
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
