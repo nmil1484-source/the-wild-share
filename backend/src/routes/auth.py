@@ -45,6 +45,11 @@ def register():
         'user': new_user.to_dict()
     }), 201
 
+# Alias route for frontend compatibility
+@auth_bp.route('/signup', methods=['POST'])
+def signup():
+    return register()
+
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
