@@ -165,6 +165,10 @@ def health():
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
+    # Don't serve frontend for API routes - let them 404 properly
+    if path.startswith('api/'):
+        return jsonify({'error': 'API endpoint not found'}), 404
+    
     # If path is empty or doesn't exist, serve index.html
     if path == '':
         response = send_from_directory(app.static_folder, 'index.html')
