@@ -70,6 +70,41 @@ def reset_database():
             'error': f'Failed to reset database: {str(e)}'
         }), 500
 
+@admin_bp.route('/admin/make-admin', methods=['POST'])
+def make_admin():
+    """
+    Make a user an admin
+    Requires admin secret key for security
+    """
+    data = request.get_json()
+    secret = data.get('secret', '')
+    email = data.get('email', '')
+    
+    # Verify admin secret
+    if secret != ADMIN_SECRET:
+        return jsonify({'error': 'Unauthorized - Invalid admin secret'}), 403
+    
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+    
+    try:
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            return jsonify({'error': f'User {email} not found'}), 404
+        
+        user.is_admin = True
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'User {email} is now an admin!',
+            'user': user.to_dict()
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to make user admin: {str(e)}'}), 500
+
 @admin_bp.route('/admin/stats', methods=['GET'])
 def get_stats():
     """
