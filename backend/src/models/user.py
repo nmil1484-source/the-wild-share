@@ -49,7 +49,7 @@ class User(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
-    equipment = db.relationship('Equipment', backref='owner', lazy=True, cascade='all, delete-orphan')
+    equipment = db.relationship('Equipment', backref='owner', lazy=True, cascade='all, delete-orphan', foreign_keys='Equipment.owner_id')
     bookings = db.relationship('Booking', backref='renter', lazy=True, foreign_keys='Booking.renter_id')
 
     def __repr__(self):

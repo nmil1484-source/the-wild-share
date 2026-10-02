@@ -1,9 +1,8 @@
 from flask import Blueprint, send_file, jsonify
-from flask_login import login_required, current_user
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from datetime import datetime
 import os
 from io import BytesIO
-from weasyprint import HTML
 from ..models.booking import Booking, db
 from ..models.equipment import Equipment
 from ..models.user import User
@@ -28,8 +27,36 @@ def render_contract_template(template_name, data):
     
     return template_content
 
-@contracts_bp.route('/api/contracts/rental-agreement/<int:booking_id>')
-@login_required
+def html_to_pdf(html_content):
+    """
+    Convert HTML to PDF bytes, or return None if WeasyPrint isn't installed.
+    Imported lazily so a missing PDF library can't stop the whole app from starting.
+    """
+    try:
+        from weasyprint import HTML
+    except (ImportError, OSError):
+        return None
+    return HTML(string=html_content).write_pdf()
+
+def send_document(html_content, base_filename):
+    """Send a contract as a PDF, falling back to printable HTML."""
+    pdf = html_to_pdf(html_content)
+    if pdf is None:
+        return send_file(
+            BytesIO(html_content.encode('utf-8')),
+            mimetype='text/html',
+            as_attachment=True,
+            download_name=f'{base_filename}.html'
+        )
+    return send_file(
+        BytesIO(pdf),
+        mimetype='application/pdf',
+        as_attachment=True,
+        download_name=f'{base_filename}.pdf'
+    )
+
+@contracts_bp.route('/contracts/rental-agreement/<int:booking_id>')
+@jwt_required()
 def download_rental_agreement(booking_id):
     """
     Generate and download the rental agreement for a booking
@@ -38,7 +65,8 @@ def download_rental_agreement(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     
     # Verify the user is either the renter or the owner
-    if current_user.id != booking.renter_id and current_user.id != booking.equipment.owner_id:
+    user_id = int(get_jwt_identity())
+    if user_id != booking.renter_id and user_id != booking.equipment.owner_id:
         return jsonify({'error': 'Unauthorized'}), 403
     
     # Get related data
@@ -59,17 +87,17 @@ def download_rental_agreement(booking_id):
     platform_fee = total_cost * 0.10  # 10% platform fee
     data = {
         'booking_date': datetime.now().strftime('%B %d, %Y'),
-        'owner_name': owner.name,
+        'owner_name': f"{owner.first_name} {owner.last_name}",
         'owner_email': owner.email,
         'owner_phone': owner.phone or 'Not provided',
         'owner_address': 'Address on file',
-        'renter_name': renter.name,
+        'renter_name': f"{renter.first_name} {renter.last_name}",
         'renter_email': renter.email,
         'renter_phone': renter.phone or 'Not provided',
         'renter_address': 'Address on file',
         'equipment_name': equipment.name,
         'equipment_category': equipment.category,
-        'equipment_description': equipment.specifications or 'See equipment listing',
+        'equipment_description': equipment.capacity_spec or 'See equipment listing',
         'start_date': booking.start_date.strftime('%B %d, %Y'),
         'end_date': booking.end_date.strftime('%B %d, %Y'),
         'rental_days': rental_days,
@@ -90,25 +118,11 @@ def download_rental_agreement(booking_id):
     # Render the template
     html_content = render_contract_template('rental_agreement_short.html', data)
     
-    # Convert to PDF
-    pdf = HTML(string=html_content).write_pdf()
-    
-    # Create a BytesIO object to send the PDF
-    pdf_io = BytesIO(pdf)
-    pdf_io.seek(0)
-    
-    # Generate filename
-    filename = f'Rental_Agreement_{booking.id}_{equipment.name.replace(" ", "_")}.pdf'
-    
-    return send_file(
-        pdf_io,
-        mimetype='application/pdf',
-        as_attachment=True,
-        download_name=filename
-    )
+    filename = f'Rental_Agreement_{booking.id}_{equipment.name.replace(" ", "_")}'
+    return send_document(html_content, filename)
 
-@contracts_bp.route('/api/contracts/liability-waiver/<int:booking_id>')
-@login_required
+@contracts_bp.route('/contracts/liability-waiver/<int:booking_id>')
+@jwt_required()
 def download_liability_waiver(booking_id):
     """
     Generate and download the liability waiver for a booking
@@ -117,7 +131,8 @@ def download_liability_waiver(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     
     # Verify the user is either the renter or the owner
-    if current_user.id != booking.renter_id and current_user.id != booking.equipment.owner_id:
+    user_id = int(get_jwt_identity())
+    if user_id != booking.renter_id and user_id != booking.equipment.owner_id:
         return jsonify({'error': 'Unauthorized'}), 403
     
     # Get related data
@@ -127,10 +142,10 @@ def download_liability_waiver(booking_id):
     
     # Prepare template data
     data = {
-        'renter_name': renter.name,
+        'renter_name': f"{renter.first_name} {renter.last_name}",
         'renter_email': renter.email,
         'renter_phone': renter.phone or 'Not provided',
-        'owner_name': owner.name,
+        'owner_name': f"{owner.first_name} {owner.last_name}",
         'equipment_name': equipment.name,
         'start_date': booking.start_date.strftime('%B %d, %Y'),
         'end_date': booking.end_date.strftime('%B %d, %Y'),
@@ -142,25 +157,11 @@ def download_liability_waiver(booking_id):
     # So we'll use the same template but with different data focus
     html_content = render_contract_template('rental_agreement_short.html', data)
     
-    # Convert to PDF
-    pdf = HTML(string=html_content).write_pdf()
-    
-    # Create a BytesIO object to send the PDF
-    pdf_io = BytesIO(pdf)
-    pdf_io.seek(0)
-    
-    # Generate filename
-    filename = f'Liability_Waiver_{booking.id}_{equipment.name.replace(" ", "_")}.pdf'
-    
-    return send_file(
-        pdf_io,
-        mimetype='application/pdf',
-        as_attachment=True,
-        download_name=filename
-    )
+    filename = f'Liability_Waiver_{booking.id}_{equipment.name.replace(" ", "_")}'
+    return send_document(html_content, filename)
 
-@contracts_bp.route('/api/contracts/all/<int:booking_id>')
-@login_required
+@contracts_bp.route('/contracts/all/<int:booking_id>')
+@jwt_required()
 def download_all_contracts(booking_id):
     """
     Generate and download all contracts as a ZIP file
@@ -171,7 +172,8 @@ def download_all_contracts(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     
     # Verify the user is either the renter or the owner
-    if current_user.id != booking.renter_id and current_user.id != booking.equipment.owner_id:
+    user_id = int(get_jwt_identity())
+    if user_id != booking.renter_id and user_id != booking.equipment.owner_id:
         return jsonify({'error': 'Unauthorized'}), 403
     
     # Get related data
@@ -191,15 +193,15 @@ def download_all_contracts(booking_id):
     # Prepare data for rental agreement
     rental_data = {
         'rental_date': datetime.now().strftime('%B %d, %Y'),
-        'owner_name': owner.name,
+        'owner_name': f"{owner.first_name} {owner.last_name}",
         'owner_email': owner.email,
         'owner_phone': owner.phone or 'Not provided',
-        'renter_name': renter.name,
+        'renter_name': f"{renter.first_name} {renter.last_name}",
         'renter_email': renter.email,
         'renter_phone': renter.phone or 'Not provided',
         'equipment_name': equipment.name,
         'equipment_category': equipment.category,
-        'equipment_specs': equipment.specifications or 'See equipment listing',
+        'equipment_specs': equipment.capacity_spec or 'See equipment listing',
         'start_date': booking.start_date.strftime('%B %d, %Y'),
         'end_date': booking.end_date.strftime('%B %d, %Y'),
         'rental_days': rental_days,
@@ -213,10 +215,10 @@ def download_all_contracts(booking_id):
     
     # Prepare data for liability waiver
     waiver_data = {
-        'renter_name': renter.name,
+        'renter_name': f"{renter.first_name} {renter.last_name}",
         'renter_email': renter.email,
         'renter_phone': renter.phone or 'Not provided',
-        'owner_name': owner.name,
+        'owner_name': f"{owner.first_name} {owner.last_name}",
         'equipment_name': equipment.name,
         'start_date': booking.start_date.strftime('%B %d, %Y'),
         'end_date': booking.end_date.strftime('%B %d, %Y'),
@@ -226,12 +228,15 @@ def download_all_contracts(booking_id):
     
     # Generate PDF (short template includes both agreement and waiver)
     rental_html = render_contract_template('rental_agreement_short.html', rental_data)
-    rental_pdf = HTML(string=rental_html).write_pdf()
+    rental_pdf = html_to_pdf(rental_html)
     
-    # Create ZIP file (short template includes both agreement and waiver in one PDF)
+    # Create ZIP file (short template includes both agreement and waiver in one document)
     zip_io = BytesIO()
     with ZipFile(zip_io, 'w') as zip_file:
-        zip_file.writestr(f'Rental_Contract_{booking.id}.pdf', rental_pdf)
+        if rental_pdf is None:
+            zip_file.writestr(f'Rental_Contract_{booking.id}.html', rental_html)
+        else:
+            zip_file.writestr(f'Rental_Contract_{booking.id}.pdf', rental_pdf)
     
     zip_io.seek(0)
     
