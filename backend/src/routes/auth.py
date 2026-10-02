@@ -30,8 +30,7 @@ def register():
         first_name=data['first_name'],
         last_name=data['last_name'],
         phone=data.get('phone'),
-        user_type=data.get('user_type', 'renter'),
-        is_admin=True  # TEMPORARY: Auto-make all new users admin
+        user_type=data.get('user_type', 'renter')
     )
     
     db.session.add(new_user)
@@ -71,8 +70,7 @@ def signup():
         first_name=data['first_name'],
         last_name=data['last_name'],
         phone=data.get('phone'),
-        user_type=data.get('user_type', 'renter'),
-        is_admin=True  # TEMPORARY: Auto-make all new users admin
+        user_type=data.get('user_type', 'renter')
     )
     
     db.session.add(new_user)

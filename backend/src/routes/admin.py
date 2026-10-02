@@ -1,16 +1,22 @@
 from flask import Blueprint, jsonify, request
 import os
+import hmac
 from src.models.user import db, User
 from src.models.equipment import Equipment
 from src.models.booking import Booking
 from src.models.message import Message
 from src.models.review import Review
 from src.models.identity_verification import IdentityVerification
+from src.routes.admin_moderation import admin_required
 
 admin_bp = Blueprint('admin', __name__)
 
-# Admin secret key - change this to something secure!
-ADMIN_SECRET = "wildshare_admin_reset_2024"
+# Admin secret comes from the ADMIN_SECRET environment variable.
+# If it isn't set, the secret-protected endpoints below are disabled.
+ADMIN_SECRET = os.environ.get('ADMIN_SECRET', '')
+
+def secret_is_valid(secret):
+    return bool(ADMIN_SECRET) and hmac.compare_digest(secret or '', ADMIN_SECRET)
 
 @admin_bp.route('/admin/reset-database', methods=['POST'])
 def reset_database():
@@ -19,12 +25,16 @@ def reset_database():
     Requires admin secret key for security.
     """
     # Get the secret from request
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     secret = data.get('secret', '')
     
     # Verify admin secret
-    if secret != ADMIN_SECRET:
+    if not secret_is_valid(secret):
         return jsonify({'error': 'Unauthorized - Invalid admin secret'}), 403
+    
+    # Wiping the database must be switched on explicitly
+    if os.environ.get('ALLOW_DATABASE_RESET', '').lower() != 'true':
+        return jsonify({'error': 'Database reset is disabled'}), 403
     
     try:
         # Delete all data in correct order (to avoid foreign key constraints)
@@ -76,12 +86,12 @@ def make_admin():
     Make a user an admin
     Requires admin secret key for security
     """
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     secret = data.get('secret', '')
     email = data.get('email', '')
     
     # Verify admin secret
-    if secret != ADMIN_SECRET:
+    if not secret_is_valid(secret):
         return jsonify({'error': 'Unauthorized - Invalid admin secret'}), 403
     
     if not email:
@@ -106,6 +116,7 @@ def make_admin():
         return jsonify({'error': f'Failed to make user admin: {str(e)}'}), 500
 
 @admin_bp.route('/admin/stats', methods=['GET'])
+@admin_required
 def get_stats():
     """
     Get current database statistics
