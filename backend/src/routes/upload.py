@@ -1,15 +1,52 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import base64
+import io
+import mimetypes
 import os
 import uuid
 from datetime import datetime
 
 upload_bp = Blueprint('upload', __name__)
 
-# Directory to store uploaded images
+# Directory to store uploaded images when S3 is not configured (local dev).
+# Railway's disk is wiped on every redeploy, so production must set S3_BUCKET_NAME.
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+S3_BUCKET_NAME = os.environ.get('S3_BUCKET_NAME')
+AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+
+_s3_client = None
+
+
+def _get_s3_client():
+    global _s3_client
+    if _s3_client is None:
+        import boto3
+        _s3_client = boto3.client(
+            's3',
+            region_name=AWS_REGION,
+            aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+            aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
+        )
+    return _s3_client
+
+
+def save_image(fileobj, filename):
+    """Store an image and return an absolute URL the frontend can load from any domain."""
+    if S3_BUCKET_NAME:
+        key = f"uploads/{filename}"
+        content_type = mimetypes.guess_type(filename)[0] or 'application/octet-stream'
+        _get_s3_client().upload_fileobj(
+            fileobj, S3_BUCKET_NAME, key,
+            ExtraArgs={'ContentType': content_type, 'CacheControl': 'public, max-age=31536000'}
+        )
+        return f"https://{S3_BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/{key}"
+
+    with open(os.path.join(UPLOAD_FOLDER, filename), 'wb') as f:
+        f.write(fileobj.read())
+    return f"{request.host_url.rstrip('/')}/uploads/{filename}"
 
 @upload_bp.route('/upload/image', methods=['POST'])
 @jwt_required()
@@ -36,14 +73,7 @@ def upload_image():
             # Generate unique filename
             file_extension = data.get('extension', 'jpg')
             filename = f"{user_id}_{uuid.uuid4().hex[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file_extension}"
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            
-            # Save file
-            with open(filepath, 'wb') as f:
-                f.write(image_bytes)
-            
-            # Return URL
-            image_url = f"/uploads/{filename}"
+            image_url = save_image(io.BytesIO(image_bytes), filename)
             
             return jsonify({
                 'message': 'Image uploaded successfully',
@@ -80,13 +110,7 @@ def upload_image():
     try:
         # Generate unique filename
         filename = f"{user_id}_{uuid.uuid4().hex[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file_extension}"
-        filepath = os.path.join(UPLOAD_FOLDER, filename)
-        
-        # Save file
-        file.save(filepath)
-        
-        # Return URL
-        image_url = f"/uploads/{filename}"
+        image_url = save_image(file.stream, filename)
         
         return jsonify({
             'message': 'Image uploaded successfully',
@@ -138,14 +162,7 @@ def upload_multiple_images():
             
             # Generate unique filename
             filename = f"{user_id}_{uuid.uuid4().hex[:8]}_{datetime.now().strftime('%Y%m%d%H%M%S')}.{file_extension}"
-            filepath = os.path.join(UPLOAD_FOLDER, filename)
-            
-            # Save file
-            file.save(filepath)
-            
-            # Add URL to list
-            image_url = f"/uploads/{filename}"
-            uploaded_urls.append(image_url)
+            uploaded_urls.append(save_image(file.stream, filename))
         
         if not uploaded_urls:
             return jsonify({'error': 'No valid images uploaded'}), 400
